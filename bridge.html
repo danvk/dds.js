@@ -10,43 +10,36 @@
   border: 1px solid black;
   border-radius: 2px;
   position: relative;
+
+  width: 24px;
+  height: 40px;
+  padding-top: 1px;
 }
-.card.hidden {
+.card.facedown {
   background-color:white;
   background-image: linear-gradient(90deg, rgba(200,0,0,.5) 50%, transparent 50%),
   linear-gradient(rgba(200,0,0,.5) 50%, transparent 50%);
   background-size:2px 2px;
 }
 
-.card-horiz {
-  width: 32px;
-  height: 20px;
-  padding-top: 1px;
-}
-.card-horiz .suit {
-  position: absolute;
-  right: 2px;
-}
-.card-horiz .rank {
-  position: absolute;
-  left: 1px;
-  right: 15px;
-  text-align: center;
-}
-
 .card-vert {
-  width: 20px;
-  height: 36px;
-  padding-top: 1px;
   display: inline-block;
 }
-.card-vert .suit {
+.card .big-suit {
   display: block;
   text-align: center;
 }
 .card-vert .rank {
   display: block;
   text-align: center;
+}
+.card-horiz .small-suit {
+  position: absolute;
+  right: 2px;
+  font-size: 14px;
+}
+.card-vert .small-suit {
+  display: none;
 }
 </style>
 <body>
