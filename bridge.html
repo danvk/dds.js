@@ -11,9 +11,12 @@
   border-radius: 2px;
   position: relative;
 
-  width: 24px;
-  height: 40px;
+  width: 22px;
+  height: 38px;
   padding-top: 1px;
+
+  display: inline-block;
+  margin: 1px;
 }
 .card.facedown {
   background-color:white;
@@ -21,25 +24,13 @@
   linear-gradient(rgba(200,0,0,.5) 50%, transparent 50%);
   background-size:2px 2px;
 }
-
-.card-vert {
-  display: inline-block;
-}
-.card .big-suit {
+.card .suit {
   display: block;
   text-align: center;
 }
-.card-vert .rank {
+.card .rank {
   display: block;
   text-align: center;
-}
-.card-horiz .small-suit {
-  position: absolute;
-  right: 2px;
-  font-size: 14px;
-}
-.card-vert .small-suit {
-  display: none;
 }
 </style>
 <body>
