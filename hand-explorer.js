@@ -25,7 +25,7 @@ class Board {
   }
 
   // Play a card
-  play(player: string, rank: number, suit: string) {
+  play(player: string, suit: string, rank: number) {
     if (player != this.player) {
       throw 'Played out of turn';
     }
@@ -36,9 +36,11 @@ class Board {
     }
 
     this.cards[player][suit].splice(idx, 1);
-    this.plays.push({player, rank, suit});
+    this.plays.push({player, suit, rank});
     if (this.plays.length == 4) {
       this.sweep();
+    } else {
+      this.player = NEXT_PLAYER[player];
     }
   }
 
