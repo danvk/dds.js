@@ -18,7 +18,7 @@ var ddsReady = new Promise(function(resolve, reject) {
 ddsReady = ddsReady.then(function() {
   solve = Module.cwrap('solve',
                        'string',
-                       ['string', 'string', 'string', 'number', 'number']);
+                       ['string', 'string', 'number', 'number']);
 });
 
 var SUITS = {'S': 0, 'H': 1, 'D': 2, 'C': 3};
@@ -42,17 +42,17 @@ function packPlays(plays) {
 
 /**
  * board is a PBN-formatted string (e.g. 'N:AKQJ.T98.76.432 ...')
+ *       The first character indicates who leads this trick.
  * trump is 'S', 'H', 'C', 'D' or 'N'
- * declarer is 'N', 'S', 'E' or 'W'
  * plays is an array of 2-character cards, e.g. ['5D', '2D, 'QD']
  */
-function nextPlays(board, trump, declarer, plays) {
-  var cacheKey = JSON.stringify({board,trump,declarer,plays});
+function nextPlays(board, trump, plays) {
+  var cacheKey = JSON.stringify({board,trump,plays});
   var cacheValue = nextPlays.cache[cacheKey];
   if (cacheValue) return cacheValue;
 
   var playsPtr = packPlays(plays);
-  var o = JSON.parse(solve(board, trump, declarer, plays.length, playsPtr));
+  var o = JSON.parse(solve(board, trump, plays.length, playsPtr));
   // ... free(playsPtr)
   nextPlays.cache[cacheKey] = o;
   return o;

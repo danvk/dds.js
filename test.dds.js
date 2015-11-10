@@ -7,7 +7,6 @@ describe('dds', function() {
     var result = nextPlays(
         'N:T843.K4.KT853.73 J97.J763.642.KJ5 Q52.Q982.QJ.9862 AK6.AT5.A97.AQT4',
         'N',
-        'W',
         ['5D', '2D', 'QD'])
     expect(result).to.deep.equal({
       player: 'W',
@@ -198,6 +197,34 @@ describe('Board', function() {
         { suit: 'D', rank: '7', equals: [], score: 9 },
         { suit: 'D', rank: '9', equals: [], score: 9 },
         { suit: 'D', rank: 'A', equals: [], score: 8 }
+      ]
+    });
+  });
+
+  it('should find next plays after a trick', function() {
+    var b = new Board('N:T843.K4.KT853.73 J97.J763.642.KJ5 Q52.Q982.QJ.9862 AK6.AT5.A97.AQT4', 'W', 'N');
+    b.play('N', 'D', 5);
+    b.play('E', 'D', 2);
+    b.play('S', 'D', 12);
+    b.play('W', 'D', 7);
+    expect(b.ns_tricks).to.equal(1);
+    expect(b.tricks).to.have.length(1);
+    expect(b.plays).to.have.length(0);
+
+    expect(b.nextPlays()).to.deep.equal({
+      player: 'S',
+      tricks: { ns: 0, ew: 0 },
+      plays: [
+        { suit: 'D', rank: 'J', equals: [], score: 3 },
+        { suit: 'H', rank: '2', equals: [], score: 2 },
+        { suit: 'H', rank: '9', equals: ['8'], score: 2 },
+        { suit: 'H', rank: 'Q', equals: [], score: 2 },
+        { suit: 'S', rank: '2', equals: [], score: 2 },
+        { suit: 'S', rank: '5', equals: [], score: 2 },
+        { suit: 'S', rank: 'Q', equals: [], score: 2 },
+        { suit: 'C', rank: '2', equals: [], score: 2 },
+        { suit: 'C', rank: '9', equals: ['8'], score: 2 },
+        { suit: 'C', rank: '6', equals: [], score: 2 }
       ]
     });
   });
