@@ -575,6 +575,9 @@ class Explorer extends React.Component {
         play.score = 13 - play.score;
       }
     });
+
+    console.log('rerender', board.strain, data);
+
     return {
       [player]: makingPlays
     };
@@ -617,11 +620,93 @@ class Explorer extends React.Component {
   }
 }
 
-var board = new Board('N:T843.K4.KT853.73 J97.J763.642.KJ5 Q52.Q982.QJ.9862 AK6.AT5.A97.AQT4', 'W', 'N');
+/**
+ * props:
+ *   initialPBN
+ *   initialDeclarer
+ *   initialStrain
+ */
+class Root extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      pbn: props.initialPBN,
+      strain: props.initialStrain,
+      declarer: props.initialDeclarer
+    };
+    this.board = this.makeBoard(this.state);
+  }
+
+  // Update in response to form changes.
+  handleFormSubmit(e: SyntheticEvent) {
+    e.preventDefault();
+    this.setState({
+      pbn: this.refs.pbn.value,
+      strain: this.refs.strain.value,
+      declarer: this.refs.declarer.value
+    });
+  }
+
+  makeBoard(state) {
+    return new Board(state.pbn, state.declarer, state.strain);
+  }
+
+  componentDidMount() {
+    this.updateUI();
+  }
+
+  componentWillUpdate(nextProps, nextState) {
+    this.board = this.makeBoard(nextState);
+  }
+
+  componentDidUpdate() {
+    this.updateUI();
+  }
+
+  updateUI() {
+    this.refs.pbn.value = this.state.pbn;
+    this.refs.strain.value = this.state.strain;
+    this.refs.declarer.value = this.state.declarer;
+  }
+
+  render() {
+    var handleFormSubmit = this.handleFormSubmit.bind(this);
+    return (
+      <div>
+        <form onSubmit={handleFormSubmit}>
+          PBN: <input type="text" size="90" ref="pbn" />
+          <br/>
+          Suit:
+          <select ref="strain" onChange={handleFormSubmit}>
+            <option value="N">No Trump</option>
+            <option value="S">Spades</option>
+            <option value="H">Hearts</option>
+            <option value="D">Diamonds</option>
+            <option value="C">Clubs</option>
+          </select>
+          <br/>
+          Declarer:
+          <select ref="declarer" onChange={handleFormSubmit}>
+            <option value="N">North</option>
+            <option value="E">East</option>
+            <option value="S">South</option>
+            <option value="W">West</option>
+          </select>
+        </form>
+        <Explorer board={this.board} />
+      </div>
+    );
+  }
+}
+
+var pbn = 'N:T843.K4.KT853.73 J97.J763.642.KJ5 Q52.Q982.QJ.9862 AK6.AT5.A97.AQT4';
+var declarer = 'W';
+var strain = 'S';
+var board = new Board(pbn, declarer, strain);
 
 ddsReady.then(() => {
   ReactDOM.render(
-    <Explorer board={board} />,
+    <Root initialPBN={pbn} initialStrain={strain} initialDeclarer={declarer} />,
     document.getElementById('root')
   );
 });
