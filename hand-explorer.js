@@ -240,6 +240,10 @@ function formatCard(card: {suit: string, rank: number}): string {
   return rankToText(card.rank) + card.suit;
 }
 
+function onSameTeam(a: string, b: string): boolean {
+  return a == b || NEXT_PLAYER[NEXT_PLAYER[a]] == b;
+}
+
 var SUITS = ['S', 'H', 'D', 'C'];
 
 var NEXT_PLAYER = {
@@ -555,6 +559,27 @@ class Explorer extends React.Component {
     this.forceUpdate();
   }
 
+  // Returns a {player -> [{suit, rank, score}, ...]} object.
+  // score is tricks available to the declarer after each play.
+  getMaking(board: Board) {
+    var data = board.nextPlays();
+    var player = data.player;
+    var makingPlays = _.flatten(data.plays.map(({suit, rank, score, equals}) => {
+      return [{suit, rank, score}].concat(equals.map(rank => ({suit, rank, score})));
+    })).map(({suit, rank, score}) => ({suit, rank: textToRank(rank), score}));
+    makingPlays.forEach(play => {
+      if (onSameTeam(player, board.declarer)) {
+        play.score += (player == 'E' || player == 'W') ? board.ew_tricks : board.ns_tricks;
+      } else {
+        play.score += (player == 'E' || player == 'W') ? board.ew_tricks : board.ns_tricks;
+        play.score = 13 - play.score;
+      }
+    });
+    return {
+      [player]: makingPlays
+    };
+  }
+
   render() {
     var board = this.props.board;
     var handleUndo = this.handleUndo.bind(this);
@@ -567,13 +592,9 @@ class Explorer extends React.Component {
     var legalPlays = board.legalPlays();
     var legalSuits = _.uniq(_.pluck(legalPlays, 'suit'));
     var legalSuit = legalSuits.length == 1 ? legalSuits[0] : 'all';
-    var data = board.nextPlays();
-    var makingPlays = _.flatten(data.plays.map(({suit, rank, score, equals}) => {
-      return [{suit, rank, score}].concat(equals.map(rank => ({suit, rank, score})));
-    })).map(({suit, rank, score}) => ({suit, rank: textToRank(rank), score}));
-    var making = {
-      [data.player]: makingPlays
-    };
+
+    var making = this.getMaking(board);
+
     return (
       <div>
         <Deal deal={board.cards}
