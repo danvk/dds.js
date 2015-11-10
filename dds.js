@@ -4,7 +4,7 @@ Module['onRuntimeInitialized'] = function() {
   solve = Module.cwrap('solve', 'string', ['string', 'string', 'string', 'number', 'number']);
 };
 
-var memoryInitializer = 'out.html.mem';
+var memoryInitializer = 'out.js.mem';
 var xhr = Module['memoryInitializerRequest'] = new XMLHttpRequest();
 xhr.open('GET', memoryInitializer, true);
 xhr.responseType = 'arraybuffer';
