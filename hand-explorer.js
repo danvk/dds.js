@@ -155,6 +155,32 @@ class Board {
     }
   }
 
+  indexForCard(suit: string, rank: string): [numer, number] {
+    for (var i = 0; i < this.tricks.length; i++) {
+      var plays = this.tricks[i].plays;
+      for (var j = 0; j < plays.length; j++) {
+        var card = plays[j];
+        if (card.suit == suit && card.rank == rank) {
+          return [i, j];
+        }
+      }
+    }
+
+    for (var j = 0; j < this.plays.length; j++) {
+      var card = this.plays[j];
+      if (card.suit == suit && card.rank == rank) {
+        return [i, j];
+      }
+    }
+
+    throw `Couldn't find played card ${rank} ${suit}`;
+  }
+
+  undoToCard(suit: string, rank: number) {
+    var [trickNum, playNum] = this.indexForCard(suit, rank);
+    this.undoToPlay(trickNum, playNum);
+  }
+
   // Sort all holdings from highest to lowest rank
   sortHands() {
     for (var player in this.cards) {
@@ -322,16 +348,27 @@ class Hand extends React.Component {
  *   lead: 'W' | ...
  *   winner: null | 'W' | ...
  *   showArrow: true | false
+ *   onClick: (suit: string, rank: number) => void
  */
 class Trick extends React.Component {
+  handleClick(player, suit: string, rank: number) {
+    if (this.props.onClick) {
+      this.props.onClick(player, suit, rank);
+    }
+  }
+  
   render() {
     // Matches size of a card
     var spacer = <div style={{width: '22px', height: '38px'}}></div>;
     var playerToCard = {N: spacer, S: spacer, E: spacer, W: spacer};
     var player = this.props.leader;
+    var makeClick = player => this.handleClick.bind(this, player);
     for (var card of this.props.plays) {
       var className = player == this.props.leader ? 'lead' : null;
-      playerToCard[player] = <Card rank={card.rank} suit={card.suit} className={className} />;
+      playerToCard[player] = <Card rank={card.rank}
+                                   suit={card.suit}
+                                   className={className}
+                                   onClick={makeClick(player)} />;
       player = NEXT_PLAYER[player];
     }
     var arrow = this.props.showArrow ? PLAYER_TO_ARROW[player] : ' ';
@@ -371,11 +408,18 @@ class Trick extends React.Component {
  *   leader: 'W'
  *   legalSuit: 'all' | 'S' | 'H' | 'C' | 'D'
  *   onClick: (player: string, suit: string, rank: number) => void
+ *   onUndo: (player: string, suit: string, rank: number) => void
  */
 class Deal extends React.Component {
   handleClick(player: string, suit: string, rank: number) {
     if (this.props.onClick) {
       this.props.onClick(player, suit, rank);
+    }
+  }
+
+  handleUndo(player: string, suit: string, rank: number) {
+    if (this.props.onUndo) {
+      this.props.onUndo(player, suit, rank);
     }
   }
 
@@ -417,7 +461,7 @@ class Deal extends React.Component {
               </div>
             </td>
             <td className="plays">
-              <Trick showArrow={true} plays={this.props.plays} leader={this.props.leader} />
+              <Trick showArrow={true} plays={this.props.plays} leader={this.props.leader} onClick={this.handleUndo.bind(this)} />
             </td>
             <td className="east">
               <div className="player-label">
@@ -456,13 +500,20 @@ class Explorer extends React.Component {
     this.forceUpdate();
   }
 
+  handleUndo(player: string, suit: string, rank: number) {
+    this.props.board.undoToCard(suit, rank);
+    this.forceUpdate();
+  }
+
   render() {
     var board = this.props.board;
+    var handleUndo = this.handleUndo.bind(this);
     var prevTricks = board.tricks.map(
         (trick, i) => <Trick key={i}
                              plays={trick.plays}
                              leader={trick.leader}
-                             winner={trick.winner} />);
+                             winner={trick.winner}
+                             onClick={handleUndo} />);
     var legalPlays = board.legalPlays();
     var legalSuits = _.uniq(_.pluck(legalPlays, 'suit'));
     var legalSuit = legalSuits.length == 1 ? legalSuits[0] : 'all';
@@ -473,6 +524,7 @@ class Explorer extends React.Component {
               leader={board.leader()}
               legalSuit={legalSuit}
               onClick={this.handleClick.bind(this)}
+              onUndo={handleUndo}
               />
         <div className="score">
           <p>{board.ns_tricks} North-South</p>

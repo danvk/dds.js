@@ -155,4 +155,21 @@ describe('Board', function() {
       {player: 'E', suit: 'D', rank: 2}
     ]);
   });
+
+  it('should find played cards', function() {
+    var b = new Board('N:T843.K4.KT853.73 J97.J763.642.KJ5 Q52.Q982.QJ.9862 AK6.AT5.A97.AQT4', 'W', 'N');
+    b.play('N', 'D', 5);
+    b.play('E', 'D', 2);
+    b.play('S', 'D', 12);
+    b.play('W', 'D', 7);  // S takes trick #1
+    b.play('S', 'D', 11);
+    b.play('W', 'D', 9);
+
+    expect(b.indexForCard('D', 5)).to.deep.equal([0, 0]);
+    expect(b.indexForCard('D', 2)).to.deep.equal([0, 1]);
+    expect(b.indexForCard('D', 12)).to.deep.equal([0, 2]);
+    expect(b.indexForCard('D', 7)).to.deep.equal([0, 3]);
+    expect(b.indexForCard('D', 11)).to.deep.equal([1, 0]);
+    expect(b.indexForCard('D', 9)).to.deep.equal([1, 1]);
+  });
 });
