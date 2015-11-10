@@ -107,7 +107,6 @@ class Board {
   nextPlays() {
     return nextPlays(this.lastTrickPBN,
                      this.strain,
-                     this.declarer,
                      this.plays.map(formatCard));
   }
 
@@ -294,6 +293,7 @@ var SUIT_SYMBOLS = {
  * props:
  *   suit: {'S', 'H', 'D', 'C'}
  *   rank: {'1'..'9', 'T', 'J', 'Q', 'K', 'A'}
+ *   making: null | number
  *   facedown: {false, true}
  *   onClick: (suit: string, rank: number) => void
  */
@@ -326,6 +326,7 @@ class Card extends React.Component {
           <div className={className} onClick={this.handleClick.bind(this)}>
             <span className='rank'>{rankSym}</span>
             <span className={'suit suit-' + suit}>{suitSym}</span>
+            <span className='making'>{this.props.making}</span>
           </div>
       );
     }
@@ -337,6 +338,7 @@ class Card extends React.Component {
  *   hand: { 'S': [4, 9, 13], ... }
  *   enable: 'all' | 'S' | 'H' | 'C' | 'D' | 'none'
  *   oneRow: boolean
+ *   making: [{rank, suit, score}]
  *   onClick: (suit: string, rank: number) => void
  */
 class Hand extends React.Component {
@@ -349,10 +351,17 @@ class Hand extends React.Component {
 
   render() {
     var click = this.handleClick.bind(this);
+    var making = _.mapObject(_.groupBy(this.props.making, 'suit'),
+                             vs => _.object(vs.map(({rank, score}) => [rank, score])));
     var cards = {};
     for (var suit in this.props.hand) {
       var holding = this.props.hand[suit];
-      cards[suit] = holding.map(rank => <Card key={rank} suit={suit} rank={rank} onClick={click} />);
+      var mkSuit = making[suit] || {};
+      cards[suit] = holding.map(rank => <Card key={rank}
+                                              suit={suit}
+                                              rank={rank}
+                                              making={mkSuit[rank]}
+                                              onClick={click} />);
     }
     var sep = this.props.oneRow ? ' ' : <br/>;
     var enable = this.props.enable || 'all';
@@ -444,8 +453,11 @@ class Trick extends React.Component {
  *   plays: [{suit: 'S', rank: 14}, ...]
  *   leader: 'W'
  *   legalSuit: 'all' | 'S' | 'H' | 'C' | 'D'
+ *   making: {player: [{rank, suit, score}]}
  *   onClick: (player: string, suit: string, rank: number) => void
  *   onUndo: (player: string, suit: string, rank: number) => void
+ *
+ * TODO: kill legalSuit and use only `making`
  */
 class Deal extends React.Component {
   handleClick(player: string, suit: string, rank: number) {
@@ -474,12 +486,13 @@ class Deal extends React.Component {
     var d = this.props.deal;
     var makeClick = player => this.handleClick.bind(this, player);
     var enables = this.getEnables();
+    var making = this.props.making;
     return (
       <table className="deal">
         <tbody>
           <tr>
             <td colSpan={3} className="north" style={{'textAlign': 'center'}}>
-              <Hand oneRow={true} hand={d.N} enable={enables.N} onClick={makeClick('N')} />
+              <Hand oneRow={true} hand={d.N} enable={enables.N} making={making.N} onClick={makeClick('N')} />
               <div className="player-label">
                 North
               </div>
@@ -488,7 +501,7 @@ class Deal extends React.Component {
           <tr>
             <td className="west">
               <div>
-                <Hand hand={d.W} enable={enables.W} onClick={makeClick('W')} />
+                <Hand hand={d.W} enable={enables.W} making={making.W} onClick={makeClick('W')} />
               </div>
               <div className="player-label">
               W<br/>
@@ -508,7 +521,7 @@ class Deal extends React.Component {
               t
               </div>
               <div>
-                <Hand hand={d.E} enable={enables.E} onClick={makeClick('E')} />
+                <Hand hand={d.E} enable={enables.E} making={making.E} onClick={makeClick('E')} />
               </div>
             </td>
           </tr>
@@ -517,7 +530,7 @@ class Deal extends React.Component {
               <div className="player-label">
                 South
               </div>
-              <Hand oneRow={true} hand={d.S} enable={enables.S} onClick={makeClick('S')} />
+              <Hand oneRow={true} hand={d.S} enable={enables.S} making={making.S} onClick={makeClick('S')} />
             </td>
           </tr>
         </tbody>
@@ -554,12 +567,20 @@ class Explorer extends React.Component {
     var legalPlays = board.legalPlays();
     var legalSuits = _.uniq(_.pluck(legalPlays, 'suit'));
     var legalSuit = legalSuits.length == 1 ? legalSuits[0] : 'all';
+    var data = board.nextPlays();
+    var makingPlays = _.flatten(data.plays.map(({suit, rank, score, equals}) => {
+      return [{suit, rank, score}].concat(equals.map(rank => ({suit, rank, score})));
+    })).map(({suit, rank, score}) => ({suit, rank: textToRank(rank), score}));
+    var making = {
+      [data.player]: makingPlays
+    };
     return (
       <div>
         <Deal deal={board.cards}
               plays={board.plays}
               leader={board.leader()}
               legalSuit={legalSuit}
+              making={making}
               onClick={this.handleClick.bind(this)}
               onUndo={handleUndo}
               />
@@ -576,12 +597,13 @@ class Explorer extends React.Component {
 }
 
 var board = new Board('N:T843.K4.KT853.73 J97.J763.642.KJ5 Q52.Q982.QJ.9862 AK6.AT5.A97.AQT4', 'W', 'N');
-// var plays = [{suit: 'D', rank: 5}, {suit: 'D', rank: 2}];
 
-ReactDOM.render(
-  <Explorer board={board} />,
-  document.getElementById('root')
-);
+ddsReady.then(() => {
+  ReactDOM.render(
+    <Explorer board={board} />,
+    document.getElementById('root')
+  );
+});
 
 window.parsePBN = parsePBN;
 window.Board = Board;
