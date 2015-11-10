@@ -1,0 +1,93 @@
+.suit-H,
+.suit-D {
+  color: red;
+}
+
+.card {
+  border: 1px solid black;
+  border-radius: 2px;
+  position: relative;
+
+  width: 24px;
+  height: 38px;
+  padding-top: 1px;
+  padding-left: 2px;
+
+  display: inline-block;
+  margin: 1px;
+}
+.card.facedown {
+  background-color:white;
+  background-image: linear-gradient(90deg, rgba(200,0,0,.5) 50%, transparent 50%),
+  linear-gradient(rgba(200,0,0,.5) 50%, transparent 50%);
+  background-size:2px 2px;
+}
+.card > .suit {
+  display: block;
+  text-align: left;
+}
+.card > .rank {
+  display: block;
+  text-align: left;
+}
+.card > .making {
+  position: absolute;
+  bottom: 1px;
+  right: 1px;
+  font-size: small;
+  color: #777;
+}
+
+.card.lead {
+  background: yellow;
+}
+
+.deal {
+  width: 475px;
+}
+td.plays {
+  width: 125px;
+  text-align: center;
+}
+
+td.west > div,
+td.east > div {
+  vertical-align: middle;
+  display: inline-block;
+}
+td.west {
+  text-align: right;
+}
+.player-label {
+  text-align: center;
+}
+td.west .player-label {
+  margin-left: 4px;
+}
+td.east .player-label {
+  margin-right: 4px;
+}
+
+.hand > .suit {
+  display: inline-block;
+}
+.suit.disabled {
+  opacity: 0.25;
+}
+
+.north-trick, .south-trick {
+  text-align: center;
+}
+table.trick {
+  margin: 0 auto;
+}
+table.trick td {
+  min-width: 30px;
+}
+
+.previous-tricks > table.trick {
+  display: inline-block;
+  border: 1px solid black;
+  margin: 2px;
+}
+
