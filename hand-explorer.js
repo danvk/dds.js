@@ -94,6 +94,7 @@ class Card extends React.Component {
 /**
  * props:
  *   hand: { 'S': [4, 9, 13], ... }
+ *   oneRow: boolean
  */
 class Hand extends React.Component {
   render() {
@@ -102,21 +103,67 @@ class Hand extends React.Component {
       var holding = this.props.hand[suit];
       cards[suit] = holding.map(rank => <Card key={rank} suit={suit} rank={rank} />);
     }
+    var sep = this.props.oneRow ? ' ' : <br/>;
     return (
       <div className="hand">
         {cards['S']}
-        <br/>
+        {sep}
         {cards['H']}
-        <br/>
+        {sep}
         {cards['C']}
-        <br/>
+        {sep}
         {cards['D']}
       </div>
     );
   }
 }
 
-var hand = parsePBN('N:T843.K4.KT853.73 J97.J763.642.KJ5 Q52.Q982.QJ.9862 AK6.AT5.A97.AQT4')
+/**
+ * props:
+ *   deal: (parsed PBN)
+ */
+class Deal extends React.Component {
+  render() {
+    var d = this.props.deal;
+    return (
+      <table>
+        <tbody>
+          <tr>
+            <td colSpan={3} style={{'textAlign': 'center'}}><Hand oneRow={true} hand={d['N']} /></td>
+          </tr>
+          <tr>
+            <td style={{'textAlign': 'right'}}>
+              <Hand hand={d['W']} />
+            </td>
+            <td>
+              <table className="compass">
+                <tbody>
+                  <tr>
+                    <td colSpan={3} style={{textAlign: 'center'}}>N</td>
+                  </tr>
+                  <tr>
+                    <td style={{textAlign: 'left'}}>W</td>
+                    <td>{' '}</td>
+                    <td style={{textAlign: 'right'}}>E</td>
+                  </tr>
+                  <tr>
+                    <td colSpan={3} style={{textAlign: 'center'}}>S</td>
+                  </tr>
+                </tbody>
+              </table>
+            </td>
+            <td><Hand hand={d['E']} /></td>
+          </tr>
+          <tr>
+            <td colSpan={3} style={{'textAlign': 'center'}}><Hand oneRow={true} hand={d['S']} /></td>
+          </tr>
+        </tbody>
+      </table>
+    );
+  }
+}
+
+var deal = parsePBN('N:T843.K4.KT853.73 J97.J763.642.KJ5 Q52.Q982.QJ.9862 AK6.AT5.A97.AQT4')
 
 ReactDOM.render(
   <div>
@@ -131,7 +178,7 @@ ReactDOM.render(
     <Card suit='D' rank='2' />
     <Card facedown={true} suit='C' rank='9' />
     <br/>
-    <Hand hand={hand['W']} />
+    <Deal deal={deal} />
   </div>,
   document.getElementById('root')
 );
