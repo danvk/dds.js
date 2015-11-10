@@ -24,11 +24,11 @@
   linear-gradient(rgba(200,0,0,.5) 50%, transparent 50%);
   background-size:2px 2px;
 }
-.card .suit {
+.card > .suit {
   display: block;
   text-align: center;
 }
-.card .rank {
+.card > .rank {
   display: block;
   text-align: center;
 }
@@ -57,6 +57,13 @@ td.west .player-label {
 }
 td.east .player-label {
   margin-right: 4px;
+}
+
+.hand > .suit {
+  display: inline-block;
+}
+.suit.disabled {
+  opacity: 0.25;
 }
 
 </style>

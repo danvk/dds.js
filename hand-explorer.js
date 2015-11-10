@@ -94,6 +94,7 @@ class Card extends React.Component {
 /**
  * props:
  *   hand: { 'S': [4, 9, 13], ... }
+ *   enable: 'all' | 'S' | 'H' | 'C' | 'D' | 'none'
  *   oneRow: boolean
  */
 class Hand extends React.Component {
@@ -104,15 +105,25 @@ class Hand extends React.Component {
       cards[suit] = holding.map(rank => <Card key={rank} suit={suit} rank={rank} />);
     }
     var sep = this.props.oneRow ? ' ' : <br/>;
+    var enable = this.props.enable || 'all';
+    var d = enable == 'all' ? true : false;
+    var enabled = {'S': d, 'H': d, 'C': d, 'D': d};
+    if (enable in enabled) {
+      enabled[enable] = true;
+    }
+    var suitClass = {};
+    for (var k in enabled) {
+      suitClass[k] = 'suit ' + (enabled[k] ? 'enable' : 'disabled');
+    }
     return (
       <div className="hand">
-        {cards['S']}
+        <div className={suitClass['S']}>{cards['S']}</div>
         {sep}
-        {cards['H']}
+        <div className={suitClass['H']}>{cards['H']}</div>
         {sep}
-        {cards['C']}
+        <div className={suitClass['C']}>{cards['C']}</div>
         {sep}
-        {cards['D']}
+        <div className={suitClass['D']}>{cards['D']}</div>
       </div>
     );
   }
@@ -120,7 +131,19 @@ class Hand extends React.Component {
 
 /**
  * props:
+ *   plays: [{suit: 'S', rank: 14}, ...]
+ *   lead: 'W'
+ */
+class Trick extends React.Component {
+  render() {
+  }
+}
+
+/**
+ * props:
  *   deal: (parsed PBN)
+ *   plays: [{suit: 'S', rank: 14}, ...]
+ *   lead: 'W'
  */
 class Deal extends React.Component {
   render() {
@@ -130,7 +153,7 @@ class Deal extends React.Component {
         <tbody>
           <tr>
             <td colSpan={3} className="north" style={{'textAlign': 'center'}}>
-              <Hand oneRow={true} hand={d['N']} />
+              <Hand oneRow={true} enable='none' hand={d['N']} />
               <div className="player-label">
                 North
               </div>
@@ -168,7 +191,7 @@ class Deal extends React.Component {
               <div className="player-label">
                 South
               </div>
-              <Hand oneRow={true} hand={d['S']} />
+              <Hand oneRow={true} enable='D' hand={d['S']} />
             </td>
           </tr>
         </tbody>
@@ -181,17 +204,6 @@ var deal = parsePBN('N:T843.K4.KT853.73 J97.J763.642.KJ5 Q52.Q982.QJ.9862 AK6.AT
 
 ReactDOM.render(
   <div>
-    <Card suit='S' rank='T' />
-    <Card suit='H' rank='A' />
-    <Card suit='C' rank='9' />
-    <Card suit='D' rank='2' />
-    <Card facedown={true} suit='D' rank='2' />
-    <Card suit='S' rank='T' />
-    <Card suit='H' rank='A' />
-    <Card suit='C' rank='9' />
-    <Card suit='D' rank='2' />
-    <Card facedown={true} suit='C' rank='9' />
-    <br/>
     <Deal deal={deal} />
   </div>,
   document.getElementById('root')
