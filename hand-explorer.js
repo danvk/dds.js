@@ -106,6 +106,63 @@ class Board {
     var cards = this.cards[player];
     return _.flatten(_.map(cards, (ranks, suit) => ranks.map(rank => ({suit, rank}))));
   }
+
+  // Undo the last play
+  undo() {
+    var prevTricks = this.tricks.length,
+        plays = this.plays.length;
+
+    if (plays == 0) {
+      if (prevTricks == 0) {
+        throw 'Cannot undo play when no plays have occurred.';
+      } else {
+        prevTricks -= 1;
+        plays = 3;
+      }
+    } else {
+      plays--;
+    }
+    this.undoToPlay(prevTricks, plays);
+  }
+
+  // Undo to a previous position.
+  // trickNum \in 0..12
+  // playNum \in 0..3
+  undoToPlay(trickNum: number, playNum: number) {
+    // gather all the cards that have been played
+    var cards = _.flatten(this.tricks.map(trick => trick.plays));
+    cards = cards.concat(this.plays);
+
+    // restore cards to hands
+    for (var {player, suit, rank} of cards) {
+      this.cards[player][suit].push(rank);
+    }
+    this.sortHands();
+
+    // reset tricks & player
+    this.player = NEXT_PLAYER[this.declarer];
+    this.tricks = [];
+    this.plays = [];
+    this.ew_tricks = 0;
+    this.ns_tricks = 0;
+
+    // replay until the appropriate point
+    for (var {player, suit, rank} of cards) {
+      if (this.tricks.length == trickNum && this.plays.length == playNum) {
+        break;
+      }
+      this.play(player, suit, rank);
+    }
+  }
+
+  // Sort all holdings from highest to lowest rank
+  sortHands() {
+    for (var player in this.cards) {
+      for (var suit in this.cards[player]) {
+        this.cards[player][suit].sort((a, b) => b - a);
+      }
+    }
+  }
 }
 
 function textToRank(txt: string): number {

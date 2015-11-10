@@ -103,4 +103,56 @@ describe('Board', function() {
       b.play('E', 'C', 5);
     }).to.throw(/follow suit/);
   });
+
+  it('should undo moves', function() {
+    var b = new Board('N:T843.K4.KT853.73 J97.J763.642.KJ5 Q52.Q982.QJ.9862 AK6.AT5.A97.AQT4', 'W', 'N');
+    expect(b.ew_tricks).to.equal(0);
+    expect(b.ns_tricks).to.equal(0);
+    expect(b.player).to.equal('N');
+    expect(b.plays).to.have.length(0);
+
+    expect(b.cards.N.D).to.deep.equal([13, 10, 8, 5, 3]);  // KT853
+    b.play('N', 'D', 5);
+    expect(b.cards.N.D).to.deep.equal([13, 10, 8, 3]);  // KT83
+    expect(b.plays).to.have.length(1);
+    expect(b.player).to.equal('E');
+
+    expect(b.cards.E.D).to.deep.equal([6, 4, 2]);
+    b.play('E', 'D', 2);
+    expect(b.cards.E.D).to.deep.equal([6, 4]);
+    expect(b.plays).to.have.length(2);
+    expect(b.player).to.equal('S');
+
+    b.undo();
+    expect(b.player).to.equal('E');
+    expect(b.plays).to.have.length(1);
+    expect(b.cards.N.D).to.deep.equal([13, 10, 8, 3]);  // KT83
+    expect(b.cards.E.D).to.deep.equal([6, 4, 2]);
+
+    b.undo();
+    expect(b.player).to.equal('N');
+    expect(b.plays).to.have.length(0);
+    expect(b.cards.N.D).to.deep.equal([13, 10, 8, 5, 3]);  // KT853
+    expect(b.cards.E.D).to.deep.equal([6, 4, 2]);
+  });
+
+  it('should undo through tricks', function() {
+    var b = new Board('N:T843.K4.KT853.73 J97.J763.642.KJ5 Q52.Q982.QJ.9862 AK6.AT5.A97.AQT4', 'W', 'N');
+    b.play('N', 'D', 5);
+    b.play('E', 'D', 2);
+    b.play('S', 'D', 12);
+    b.play('W', 'D', 9);  // S takes trick #1
+    b.play('S', 'D', 11);
+
+    expect(b.ew_tricks).to.equal(0);
+    expect(b.ns_tricks).to.equal(1);
+
+    b.undoToPlay(0, 2);
+    expect(b.ew_tricks).to.equal(0);
+    expect(b.ns_tricks).to.equal(0);
+    expect(b.plays).to.deep.equal([
+      {player: 'N', suit: 'D', rank: 5},
+      {player: 'E', suit: 'D', rank: 2}
+    ]);
+  });
 });
