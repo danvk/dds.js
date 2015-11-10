@@ -312,6 +312,7 @@ class Trick extends React.Component {
  *   deal: (parsed PBN)
  *   plays: [{suit: 'S', rank: 14}, ...]
  *   leader: 'W'
+ *   legalSuit: 'all' | 'S' | 'H' | 'C' | 'D'
  *   onClick: (player: string, suit: string, rank: number) => void
  */
 class Deal extends React.Component {
@@ -321,15 +322,26 @@ class Deal extends React.Component {
     }
   }
 
+  getEnables() {
+    var enables = {'N': 'none', 'E': 'none', 'S': 'none', 'W': 'none'};
+    var player = this.props.leader;
+    for (var i = 0; i < this.props.plays.length; i++) {
+      player = NEXT_PLAYER[player];
+    }
+    enables[player] = this.props.legalSuit;
+    return enables;
+  }
+
   render() {
     var d = this.props.deal;
     var makeClick = player => this.handleClick.bind(this, player);
+    var enables = this.getEnables();
     return (
       <table className="deal">
         <tbody>
           <tr>
             <td colSpan={3} className="north" style={{'textAlign': 'center'}}>
-              <Hand oneRow={true} hand={d['N']} onClick={makeClick('N')} />
+              <Hand oneRow={true} hand={d.N} enable={enables.N} onClick={makeClick('N')} />
               <div className="player-label">
                 North
               </div>
@@ -338,7 +350,7 @@ class Deal extends React.Component {
           <tr>
             <td className="west">
               <div>
-                <Hand hand={d['W']} onClick={makeClick('W')} />
+                <Hand hand={d.W} enable={enables.W} onClick={makeClick('W')} />
               </div>
               <div className="player-label">
               W<br/>
@@ -358,7 +370,7 @@ class Deal extends React.Component {
               t
               </div>
               <div>
-                <Hand hand={d['E']} onClick={makeClick('E')} />
+                <Hand hand={d.E} enable={enables.E} onClick={makeClick('E')} />
               </div>
             </td>
           </tr>
@@ -367,7 +379,7 @@ class Deal extends React.Component {
               <div className="player-label">
                 South
               </div>
-              <Hand oneRow={true} hand={d['S']} onClick={makeClick('S')} />
+              <Hand oneRow={true} hand={d.S} enable={enables.S} onClick={makeClick('S')} />
             </td>
           </tr>
         </tbody>
@@ -394,11 +406,15 @@ class Explorer extends React.Component {
                              plays={trick.plays}
                              leader={trick.leader}
                              winner={trick.winner} />);
+    var legalPlays = board.legalPlays();
+    var legalSuits = _.uniq(_.pluck(legalPlays, 'suit'));
+    var legalSuit = legalSuits.length == 1 ? legalSuits[0] : 'all';
     return (
       <div>
         <Deal deal={board.cards}
               plays={board.plays}
               leader={board.leader()}
+              legalSuit={legalSuit}
               onClick={this.handleClick.bind(this)}
               />
         <div className="score">
