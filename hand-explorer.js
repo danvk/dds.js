@@ -21,6 +21,12 @@ var NEXT_PLAYER = {
   'S': 'W',
   'W': 'N'
 };
+var PLAYER_TO_ARROW = {
+  'N': '⬆',
+  'W': '⬅',
+  'S': '⬇',
+  'E': '➡'
+};
 
 function parsePBN(pbn: string) {
   var parts = pbn.split(' ');
@@ -73,16 +79,17 @@ class Card extends React.Component {
     if (rankSym == 12) rankSym = 'Q';
     if (rankSym == 13) rankSym = 'K';
     if (rankSym == 14) rankSym = 'A';
+    var className = 'card' + (this.props.className ? ' ' + this.props.className : '');
     if (this.props.facedown) {
       return (
-          <div className='card facedown'>
+          <div className={className + ' facedown'}>
             <span className='rank'>{'\u00a0'}</span>
             <span className='suit'>{'\u00a0'}</span>
           </div>
         );
     } else {
       return (
-          <div className='card'>
+          <div className={className}>
             <span className='rank'>{rankSym}</span>
             <span className={'suit suit-' + suit}>{suitSym}</span>
           </div>
@@ -132,10 +139,48 @@ class Hand extends React.Component {
 /**
  * props:
  *   plays: [{suit: 'S', rank: 14}, ...]
- *   lead: 'W'
+ *   lead: 'W' | ...
+ *   winner: null | 'W' | ...
+ *   showArrow: true | false
  */
 class Trick extends React.Component {
   render() {
+    // Matches size of a card
+    var spacer = <div style={{width: '22px', height: '38px'}}></div>;
+    var playerToCard = {N: spacer, S: spacer, E: spacer, W: spacer};
+    var player = this.props.lead;
+    for (var card of this.props.plays) {
+      var className = player == this.props.lead ? 'lead' : null;
+      playerToCard[player] = <Card rank={card.rank} suit={card.suit} className={className} />;
+      player = NEXT_PLAYER[player];
+    }
+    var arrow = this.props.showArrow ? PLAYER_TO_ARROW[player] : ' ';
+
+    return (
+      <table className="trick">
+        <tbody>
+          <tr>
+            <td colSpan={3} className="north-trick">
+              {playerToCard['N']}
+            </td>
+          </tr>
+          <tr>
+            <td className="west-trick">
+              {playerToCard['W']}
+            </td>
+            <td>{arrow}</td>
+            <td className="east-trick">
+              {playerToCard['E']}
+            </td>
+          </tr>
+          <tr>
+            <td colSpan={3} className="south-trick">
+              {playerToCard['S']}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    );
   }
 }
 
@@ -172,7 +217,7 @@ class Deal extends React.Component {
               </div>
             </td>
             <td className="plays">
-              (Plays)
+              <Trick showArrow={true} plays={this.props.plays} lead={this.props.lead} />
             </td>
             <td className="east">
               <div className="player-label">
@@ -201,10 +246,11 @@ class Deal extends React.Component {
 }
 
 var deal = parsePBN('N:T843.K4.KT853.73 J97.J763.642.KJ5 Q52.Q982.QJ.9862 AK6.AT5.A97.AQT4')
+var plays = [{suit: 'D', rank: 5}, {suit: 'D', rank: 2}];
 
 ReactDOM.render(
   <div>
-    <Deal deal={deal} />
+    <Deal deal={deal} plays={plays} lead='N'/>
   </div>,
   document.getElementById('root')
 );
