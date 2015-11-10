@@ -24,6 +24,10 @@ class Board {
     this.ns_tricks = 0;
   }
 
+  leader(): string {
+    return this.plays.length ? this.plays[0].player : this.player;
+  }
+
   // Play a card
   play(player: string, suit: string, rank: number) {
     if (player != this.player) {
@@ -145,8 +149,15 @@ var SUIT_SYMBOLS = {
  *   suit: {'S', 'H', 'D', 'C'}
  *   rank: {'1'..'9', 'T', 'J', 'Q', 'K', 'A'}
  *   facedown: {false, true}
+ *   onClick: (suit: string, rank: number) => void
  */
 class Card extends React.Component {
+  handleClick() {
+    if (this.props.onClick) {
+      this.props.onClick(this.props.suit, this.props.rank);
+    }
+  }
+
   render() {
     var suit = this.props.suit;
     var suitSym = SUIT_SYMBOLS[suit];
@@ -166,7 +177,7 @@ class Card extends React.Component {
         );
     } else {
       return (
-          <div className={className}>
+          <div className={className} onClick={this.handleClick.bind(this)}>
             <span className='rank'>{rankSym}</span>
             <span className={'suit suit-' + suit}>{suitSym}</span>
           </div>
@@ -180,13 +191,21 @@ class Card extends React.Component {
  *   hand: { 'S': [4, 9, 13], ... }
  *   enable: 'all' | 'S' | 'H' | 'C' | 'D' | 'none'
  *   oneRow: boolean
+ *   onClick: (suit: string, rank: number) => void
  */
 class Hand extends React.Component {
+  handleClick(suit: string, rank: number) {
+    if (this.props.onClick) {
+      this.props.onClick(suit, rank);
+    }
+  }
+
   render() {
+    var click = this.handleClick.bind(this);
     var cards = {};
     for (var suit in this.props.hand) {
       var holding = this.props.hand[suit];
-      cards[suit] = holding.map(rank => <Card key={rank} suit={suit} rank={rank} />);
+      cards[suit] = holding.map(rank => <Card key={rank} suit={suit} rank={rank} onClick={click} />);
     }
     var sep = this.props.oneRow ? ' ' : <br/>;
     var enable = this.props.enable || 'all';
@@ -266,16 +285,24 @@ class Trick extends React.Component {
  *   deal: (parsed PBN)
  *   plays: [{suit: 'S', rank: 14}, ...]
  *   lead: 'W'
+ *   onClick: (player: string, suit: string, rank: number) => void
  */
 class Deal extends React.Component {
+  handleClick(player: string, suit: string, rank: number) {
+    if (this.props.onClick) {
+      this.props.onClick(player, suit, rank);
+    }
+  }
+
   render() {
     var d = this.props.deal;
+    var makeClick = player => this.handleClick.bind(this, player);
     return (
       <table className="deal">
         <tbody>
           <tr>
             <td colSpan={3} className="north" style={{'textAlign': 'center'}}>
-              <Hand oneRow={true} enable='none' hand={d['N']} />
+              <Hand oneRow={true} hand={d['N']} onClick={makeClick('N')} />
               <div className="player-label">
                 North
               </div>
@@ -284,7 +311,7 @@ class Deal extends React.Component {
           <tr>
             <td className="west">
               <div>
-                <Hand hand={d['W']} />
+                <Hand hand={d['W']} onClick={makeClick('W')} />
               </div>
               <div className="player-label">
               W<br/>
@@ -304,7 +331,7 @@ class Deal extends React.Component {
               t
               </div>
               <div>
-                <Hand hand={d['E']} />
+                <Hand hand={d['E']} onClick={makeClick('E')} />
               </div>
             </td>
           </tr>
@@ -313,7 +340,7 @@ class Deal extends React.Component {
               <div className="player-label">
                 South
               </div>
-              <Hand oneRow={true} enable='D' hand={d['S']} />
+              <Hand oneRow={true} hand={d['S']} onClick={makeClick('S')} />
             </td>
           </tr>
         </tbody>
@@ -322,13 +349,34 @@ class Deal extends React.Component {
   }
 }
 
-var deal = parsePBN('N:T843.K4.KT853.73 J97.J763.642.KJ5 Q52.Q982.QJ.9862 AK6.AT5.A97.AQT4')
-var plays = [{suit: 'D', rank: 5}, {suit: 'D', rank: 2}];
+class Explorer extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+
+  handleClick(player: string, suit: string, rank: number) {
+    console.log(player, suit, rank);
+  }
+
+  render() {
+    var board = this.props.board;
+    return (
+      <div>
+        <Deal deal={board.cards}
+              plays={board.plays}
+              lead={board.leader()}
+              onClick={this.handleClick.bind(this)}
+              />
+      </div>
+    );
+  }
+}
+
+var board = new Board('N:T843.K4.KT853.73 J97.J763.642.KJ5 Q52.Q982.QJ.9862 AK6.AT5.A97.AQT4', 'W', 'N');
+// var plays = [{suit: 'D', rank: 5}, {suit: 'D', rank: 2}];
 
 ReactDOM.render(
-  <div>
-    <Deal deal={deal} plays={plays} lead='N'/>
-  </div>,
+  <Explorer board={board} />,
   document.getElementById('root')
 );
 
