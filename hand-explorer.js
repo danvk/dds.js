@@ -38,6 +38,10 @@ class Board {
     if (idx == -1) {
       throw `${player} tried to play ${rank} ${suit} which was not in hand.`;
     }
+    var legalPlays = this.legalPlays();
+    if (!_.find(legalPlays, {player, suit, rank})) {
+      throw `${suit} ${rank} by ${player} does not follow suit.`;
+    }
 
     this.cards[player][suit].splice(idx, 1);
     this.plays.push({player, suit, rank});
@@ -79,6 +83,28 @@ class Board {
     } else {
       this.ew_tricks++;
     }
+  }
+
+  // Returns an array of {player, suit, rank} objects.
+  // TODO: replace this with a call to nextPlays()
+  legalPlays() {
+    var player = this.player;
+    var followSuit = this.plays.length ? this.plays[0].suit : null;
+    if (followSuit && this.cards[player][followSuit].length == 0) {
+      followSuit = null;
+    }
+
+    var cards = this.cardsForPlayer(player);
+    if (followSuit) {
+      cards = cards.filter(({suit}) => suit == followSuit);
+    }
+    return cards.map(({suit, rank}) => ({player, suit, rank}));
+  }
+
+  // Returns an array of {suit, rank} objects.
+  cardsForPlayer(player: string) {
+    var cards = this.cards[player];
+    return _.flatten(_.map(cards, (ranks, suit) => ranks.map(rank => ({suit, rank}))));
   }
 }
 
@@ -195,7 +221,8 @@ class Card extends React.Component {
  */
 class Hand extends React.Component {
   handleClick(suit: string, rank: number) {
-    if (this.props.onClick) {
+    var enable = this.props.enable || 'all';
+    if (this.props.onClick && (enable == 'all' || enable == suit)) {
       this.props.onClick(suit, rank);
     }
   }
@@ -244,9 +271,9 @@ class Trick extends React.Component {
     // Matches size of a card
     var spacer = <div style={{width: '22px', height: '38px'}}></div>;
     var playerToCard = {N: spacer, S: spacer, E: spacer, W: spacer};
-    var player = this.props.lead;
+    var player = this.props.leader;
     for (var card of this.props.plays) {
-      var className = player == this.props.lead ? 'lead' : null;
+      var className = player == this.props.leader ? 'lead' : null;
       playerToCard[player] = <Card rank={card.rank} suit={card.suit} className={className} />;
       player = NEXT_PLAYER[player];
     }
@@ -284,7 +311,7 @@ class Trick extends React.Component {
  * props:
  *   deal: (parsed PBN)
  *   plays: [{suit: 'S', rank: 14}, ...]
- *   lead: 'W'
+ *   leader: 'W'
  *   onClick: (player: string, suit: string, rank: number) => void
  */
 class Deal extends React.Component {
@@ -321,7 +348,7 @@ class Deal extends React.Component {
               </div>
             </td>
             <td className="plays">
-              <Trick showArrow={true} plays={this.props.plays} lead={this.props.lead} />
+              <Trick showArrow={true} plays={this.props.plays} leader={this.props.leader} />
             </td>
             <td className="east">
               <div className="player-label">
@@ -355,18 +382,32 @@ class Explorer extends React.Component {
   }
 
   handleClick(player: string, suit: string, rank: number) {
-    console.log(player, suit, rank);
+    var board = this.props.board;
+    board.play(player, suit, rank);
+    this.forceUpdate();
   }
 
   render() {
     var board = this.props.board;
+    var prevTricks = board.tricks.map(
+        (trick, i) => <Trick key={i}
+                             plays={trick.plays}
+                             leader={trick.leader}
+                             winner={trick.winner} />);
     return (
       <div>
         <Deal deal={board.cards}
               plays={board.plays}
-              lead={board.leader()}
+              leader={board.leader()}
               onClick={this.handleClick.bind(this)}
               />
+        <div className="score">
+          <p>{board.ns_tricks} North-South</p>
+          <p>{board.ew_tricks} East-West</p>
+        </div>
+        <div className="previous-tricks">
+          {prevTricks}
+        </div>
       </div>
     );
   }
