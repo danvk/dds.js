@@ -126,36 +126,50 @@ class Deal extends React.Component {
   render() {
     var d = this.props.deal;
     return (
-      <table>
+      <table className="deal">
         <tbody>
           <tr>
-            <td colSpan={3} style={{'textAlign': 'center'}}><Hand oneRow={true} hand={d['N']} /></td>
+            <td colSpan={3} className="north" style={{'textAlign': 'center'}}>
+              <Hand oneRow={true} hand={d['N']} />
+              <div className="player-label">
+                North
+              </div>
+            </td>
           </tr>
           <tr>
-            <td style={{'textAlign': 'right'}}>
-              <Hand hand={d['W']} />
+            <td className="west">
+              <div>
+                <Hand hand={d['W']} />
+              </div>
+              <div className="player-label">
+              W<br/>
+              e<br/>
+              s<br/>
+              t
+              </div>
             </td>
-            <td>
-              <table className="compass">
-                <tbody>
-                  <tr>
-                    <td colSpan={3} style={{textAlign: 'center'}}>N</td>
-                  </tr>
-                  <tr>
-                    <td style={{textAlign: 'left'}}>W</td>
-                    <td>{' '}</td>
-                    <td style={{textAlign: 'right'}}>E</td>
-                  </tr>
-                  <tr>
-                    <td colSpan={3} style={{textAlign: 'center'}}>S</td>
-                  </tr>
-                </tbody>
-              </table>
+            <td className="plays">
+              (Plays)
             </td>
-            <td><Hand hand={d['E']} /></td>
+            <td className="east">
+              <div className="player-label">
+              E<br/>
+              a<br/>
+              s<br/>
+              t
+              </div>
+              <div>
+                <Hand hand={d['E']} />
+              </div>
+            </td>
           </tr>
           <tr>
-            <td colSpan={3} style={{'textAlign': 'center'}}><Hand oneRow={true} hand={d['S']} /></td>
+            <td colSpan={3} className="south" style={{'textAlign': 'center'}}>
+              <div className="player-label">
+                South
+              </div>
+              <Hand oneRow={true} hand={d['S']} />
+            </td>
           </tr>
         </tbody>
       </table>
