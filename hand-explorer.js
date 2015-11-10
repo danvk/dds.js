@@ -15,6 +15,7 @@ type CompleteTrick = {
 class Board {
   constructor(pbn: string, declarer: string, strain: string) {
     this.cards = parsePBN(pbn);  // remaining cards in hands
+    this.lastTrickPBN = pbn;
     this.declarer = declarer;
     this.strain = strain;  // e.g. spades or no trump ('H', 'S', 'N', ...)
     this.player = NEXT_PLAYER[declarer];  // next to play
@@ -83,6 +84,7 @@ class Board {
     } else {
       this.ew_tricks++;
     }
+    this.lastTrickPBN = this.toPBN();
   }
 
   // Returns an array of {player, suit, rank} objects.
@@ -99,6 +101,14 @@ class Board {
       cards = cards.filter(({suit}) => suit == followSuit);
     }
     return cards.map(({suit, rank}) => ({player, suit, rank}));
+  }
+
+  // Interface to dds.js
+  nextPlays() {
+    return nextPlays(this.lastTrickPBN,
+                     this.strain,
+                     this.declarer,
+                     this.plays.map(formatCard));
   }
 
   // Returns an array of {suit, rank} objects.
@@ -145,6 +155,7 @@ class Board {
     this.plays = [];
     this.ew_tricks = 0;
     this.ns_tricks = 0;
+    this.lastTrickPBN = this.toPBN();
 
     // replay until the appropriate point
     for (var {player, suit, rank} of cards) {
@@ -189,6 +200,17 @@ class Board {
       }
     }
   }
+
+  toPBN() {
+    var player = this.player;
+    var holdings = [];
+    for (var i = 0; i < 4; i++) {
+      var hand = this.cards[player];
+      holdings.push(['S', 'H', 'D', 'C'].map(suit => hand[suit].map(rankToText).join('')).join('.'));
+      player = NEXT_PLAYER[player];
+    }
+    return this.player + ':' + holdings.join(' ');
+  }
 }
 
 function textToRank(txt: string): number {
@@ -202,6 +224,21 @@ function textToRank(txt: string): number {
   if (txt == 'K') return 13;
   if (txt == 'A') return 14;
   throw 'Invalid card symbol: ' + txt;
+}
+
+function rankToText(rank: number): string {
+  if (rank < 10) return String(rank);
+  else if (rank == 10) return 'T';
+  else if (rank == 11) return 'J';
+  else if (rank == 12) return 'Q';
+  else if (rank == 13) return 'K';
+  else if (rank == 14) return 'A';
+  throw 'Invalid card rank: ' + rank;
+}
+
+// Returns a 2-character string like "QD" or "TH"
+function formatCard(card: {suit: string, rank: number}): string {
+  return rankToText(card.rank) + card.suit;
 }
 
 var SUITS = ['S', 'H', 'D', 'C'];

@@ -4,7 +4,11 @@ chai.config.truncateThreshold = 0;  // disable truncating
 
 describe('dds', function() {
   it('should solve mid-trick', function() {
-    var result = nextPlays('N:T843.K4.KT853.73 J97.J763.642.KJ5 Q52.Q982.QJ.9862 AK6.AT5.A97.AQT4', 'N', 'W', ['5D', '2D', 'QD'])
+    var result = nextPlays(
+        'N:T843.K4.KT853.73 J97.J763.642.KJ5 Q52.Q982.QJ.9862 AK6.AT5.A97.AQT4',
+        'N',
+        'W',
+        ['5D', '2D', 'QD'])
     expect(result).to.deep.equal({
       player: 'W',
       tricks: { ns: 0, ew: 0 },
@@ -171,5 +175,30 @@ describe('Board', function() {
     expect(b.indexForCard('D', 7)).to.deep.equal([0, 3]);
     expect(b.indexForCard('D', 11)).to.deep.equal([1, 0]);
     expect(b.indexForCard('D', 9)).to.deep.equal([1, 1]);
+  });
+
+  it('should generate PBN', function() {
+    var b = new Board('N:T843.K4.KT853.73 J97.J763.642.KJ5 Q52.Q982.QJ.9862 AK6.AT5.A97.AQT4', 'W', 'N');
+    b.play('N', 'D', 5);
+    b.play('E', 'D', 2);
+    b.play('S', 'D', 12);
+    b.play('W', 'D', 7);  // S takes trick #1
+    expect(b.toPBN()).to.equal('S:Q52.Q982.J.9862 AK6.AT5.A9.AQT4 T843.K4.KT83.73 J97.J763.64.KJ5');
+  });
+
+  it('should find next plays', function() {
+    var b = new Board('N:T843.K4.KT853.73 J97.J763.642.KJ5 Q52.Q982.QJ.9862 AK6.AT5.A97.AQT4', 'W', 'N');
+    b.play('N', 'D', 5);
+    b.play('E', 'D', 2);
+    b.play('S', 'D', 12);
+    expect(b.nextPlays()).to.deep.equal({
+      player: 'W',
+      tricks: { ns: 0, ew: 0 },
+      plays: [
+        { suit: 'D', rank: '7', equals: [], score: 9 },
+        { suit: 'D', rank: '9', equals: [], score: 9 },
+        { suit: 'D', rank: 'A', equals: [], score: 8 }
+      ]
+    });
   });
 });
