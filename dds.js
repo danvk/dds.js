@@ -21,7 +21,7 @@ ddsReady = ddsReady.then(function() {
                        ['string', 'string', 'string', 'number', 'number']);
 });
 
-var SUITS = {'S': 0, 'H': 1, 'D': 2, 'C': 3};;
+var SUITS = {'S': 0, 'H': 1, 'D': 2, 'C': 3};
 var RANKS = {'2': 2, '3': 3, '4': 4, '5': 5, '6': 6,
              '7': 7, '8': 8, '9': 9, 'T': 10, 'J': 11,
              'Q': 12, 'K': 13, 'A': 14};
@@ -40,9 +40,21 @@ function packPlays(plays) {
   return buf;
 }
 
+/**
+ * board is a PBN-formatted string (e.g. 'N:AKQJ.T98.76.432 ...')
+ * trump is 'S', 'H', 'C', 'D' or 'N'
+ * declarer is 'N', 'S', 'E' or 'W'
+ * plays is an array of 2-character cards, e.g. ['5D', '2D, 'QD']
+ */
 function nextPlays(board, trump, declarer, plays) {
+  var cacheKey = JSON.stringify({board,trump,declarer,plays});
+  var cacheValue = nextPlays.cache[cacheKey];
+  if (cacheValue) return cacheValue;
+
   var playsPtr = packPlays(plays);
   var o = JSON.parse(solve(board, trump, declarer, plays.length, playsPtr));
   // ... free(playsPtr)
+  nextPlays.cache[cacheKey] = o;
   return o;
 }
+nextPlays.cache = {};
