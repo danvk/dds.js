@@ -1,4 +1,80 @@
-'N:T843.K4.KT853.73 J97.J763.642.KJ5 Q52.Q982.QJ.9862 AK6.AT5.A97.AQT4'
+// 'N:T843.K4.KT853.73 J97.J763.642.KJ5 Q52.Q982.QJ.9862 AK6.AT5.A97.AQT4'
+
+type Play = {
+  suit: string;
+  rank: number;
+  player: string;
+};
+
+type CompleteTrick = {
+  leader: string;
+  winner: ?string;
+  plays: Play[];
+};
+
+class Board {
+  constructor(pbn: string, declarer: string, strain: string) {
+    this.cards = parsePBN(pbn);  // remaining cards in hands
+    this.declarer = declarer;
+    this.strain = strain;  // e.g. spades or no trump ('H', 'S', 'N', ...)
+    this.player = NEXT_PLAYER[declarer];  // next to play
+    this.plays = [];  // plays in this trick
+    this.tricks = [];  // previous tricks. Array of CompleteTrick.
+    this.ew_tricks = 0;
+    this.ns_tricks = 0;
+  }
+
+  // Play a card
+  play(player: string, rank: number, suit: string) {
+    if (player != this.player) {
+      throw 'Played out of turn';
+    }
+    var holding = this.cards[player][suit];
+    var idx = holding.indexOf(rank);
+    if (idx == -1) {
+      throw `${player} tried to play ${rank} ${suit} which was not in hand.`;
+    }
+
+    this.cards[player][suit].splice(idx, 1);
+    this.plays.push({player, rank, suit});
+    if (this.plays.length == 4) {
+      this.sweep();
+    }
+  }
+
+  // A trick has been completed. Determine the winner and advance the state.
+  sweep() {
+    if (this.plays.length != 4) {
+      throw 'Tried to sweep incomplete trick';
+    }
+    var topSuit = this.plays[0].suit,
+        topRank = this.plays[0].rank,
+        winner = this.plays[0].player;
+    for (var i = 1; i < 4; i++) {
+      var {suit, rank, player} = this.plays[i];
+      if ((suit == topSuit && rank > topRank) ||
+          (suit == this.strain && topSuit != this.strain)) {
+        topSuit = suit;
+        topRank = rank;
+        winner = player;
+      }
+    }
+
+    var trick = {
+      plays: this.plays,
+      leader: this.plays[0].player,
+      winner
+    };
+    this.tricks.push(trick);
+    this.plays = [];
+    this.player = winner;
+    if (winner == 'N' || winner == 'S') {
+      this.ns_tricks++;
+    } else {
+      this.ew_tricks++;
+    }
+  }
+}
 
 function textToRank(txt: string): number {
   if (txt.length != 1) {
@@ -54,7 +130,6 @@ function parsePBN(pbn: string) {
   });
   return deal;
 }
-window.parsePBN = parsePBN;
 
 var SUIT_SYMBOLS = {
   'S': '♠',
@@ -254,3 +329,6 @@ ReactDOM.render(
   </div>,
   document.getElementById('root')
 );
+
+window.parsePBN = parsePBN;
+window.Board = Board;

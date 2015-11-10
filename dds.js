@@ -1,18 +1,25 @@
-var Module = {};
 var solve;
-Module['onRuntimeInitialized'] = function() {
-  solve = Module.cwrap('solve', 'string', ['string', 'string', 'string', 'number', 'number']);
-};
+var Module = {};
+var ddsReady = new Promise(function(resolve, reject) {
+  Module['onRuntimeInitialized'] = function() {
+    resolve(solve);
+  };
 
-var memoryInitializer = 'out.js.mem';
-var xhr = Module['memoryInitializerRequest'] = new XMLHttpRequest();
-xhr.open('GET', memoryInitializer, true);
-xhr.responseType = 'arraybuffer';
-xhr.send(null);
-var script = document.createElement('script');
-script.src = "out.js";
-document.body.appendChild(script);
+  var memoryInitializer = 'out.js.mem';
+  var xhr = Module['memoryInitializerRequest'] = new XMLHttpRequest();
+  xhr.open('GET', memoryInitializer, true);
+  xhr.responseType = 'arraybuffer';
+  xhr.send(null);
+  var script = document.createElement('script');
+  script.src = "out.js";
+  document.body.appendChild(script);
+});
 
+ddsReady = ddsReady.then(function() {
+  solve = Module.cwrap('solve',
+                       'string',
+                       ['string', 'string', 'string', 'number', 'number']);
+});
 
 var SUITS = {'S': 0, 'H': 1, 'D': 2, 'C': 3};;
 var RANKS = {'2': 2, '3': 3, '4': 4, '5': 5, '6': 6,
