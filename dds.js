@@ -55,7 +55,7 @@ function nextPlays(board, trump, plays) {
   var o = JSON.parse(solve(board, trump, plays.length, playsPtr));
   // ... free(playsPtr)
   nextPlays.cache[cacheKey] = o;
-  console.log(cacheKey, cacheValue);
+  // console.log(cacheKey, cacheValue);
   return o;
 }
 nextPlays.cache = {};

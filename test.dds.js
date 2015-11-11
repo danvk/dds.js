@@ -2,12 +2,11 @@ var expect = chai.expect;
 
 chai.config.truncateThreshold = 0;  // disable truncating
 
+var pbn = 'N:T843.K4.KT853.73 J97.J763.642.KJ5 Q52.Q982.QJ.9862 AK6.AT5.A97.AQT4';
+
 describe('dds', function() {
   it('should solve mid-trick', function() {
-    var result = nextPlays(
-        'N:T843.K4.KT853.73 J97.J763.642.KJ5 Q52.Q982.QJ.9862 AK6.AT5.A97.AQT4',
-        'N',
-        ['5D', '2D', 'QD'])
+    var result = nextPlays(pbn, 'N', ['5D', '2D', 'QD'])
     expect(result).to.deep.equal({
       player: 'W',
       tricks: { ns: 0, ew: 0 },
@@ -18,11 +17,20 @@ describe('dds', function() {
       ]
     });
   });
+
+  it('should distinguish strains', function() {
+    this.timeout(5000);
+    var result;
+    result = nextPlays(pbn, 'N', []);
+    expect(_.find(result.plays, {suit: 'S', rank: 'T'}).score).to.equal(3);
+    result = nextPlays(pbn, 'S', []);
+    expect(_.find(result.plays, {suit: 'S', rank: 'T'}).score).to.equal(5);
+  });
 });
 
 describe('Board', function() {
   it('should play a card', function() {
-    var b = new Board('N:T843.K4.KT853.73 J97.J763.642.KJ5 Q52.Q982.QJ.9862 AK6.AT5.A97.AQT4', 'W', 'N');
+    var b = new Board(pbn, 'W', 'N');
     expect(b.ew_tricks).to.equal(0);
     expect(b.ns_tricks).to.equal(0);
     expect(b.declarer).to.equal('W');
@@ -55,7 +63,7 @@ describe('Board', function() {
   });
 
   it('should play a trick', function() {
-    var b = new Board('N:T843.K4.KT853.73 J97.J763.642.KJ5 Q52.Q982.QJ.9862 AK6.AT5.A97.AQT4', 'W', 'N');
+    var b = new Board(pbn, 'W', 'N');
     b.play('N', 'D', 5);
     b.play('E', 'D', 2);
     b.play('S', 'D', 12);
@@ -80,7 +88,7 @@ describe('Board', function() {
   });
 
   it('should determine legal plays', function() {
-    var b = new Board('N:T843.K4.KT853.73 J97.J763.642.KJ5 Q52.Q982.QJ.9862 AK6.AT5.A97.AQT4', 'W', 'N');
+    var b = new Board(pbn, 'W', 'N');
     b.play('N', 'D', 5);
 
     expect(b.legalPlays()).to.deep.equal([
@@ -100,7 +108,7 @@ describe('Board', function() {
   });
 
   it('should throw on illegal plays', function() {
-    var b = new Board('N:T843.K4.KT853.73 J97.J763.642.KJ5 Q52.Q982.QJ.9862 AK6.AT5.A97.AQT4', 'W', 'N');
+    var b = new Board(pbn, 'W', 'N');
     b.play('N', 'D', 5);
     expect(() => {
       b.play('E', 'C', 5);
@@ -108,7 +116,7 @@ describe('Board', function() {
   });
 
   it('should undo moves', function() {
-    var b = new Board('N:T843.K4.KT853.73 J97.J763.642.KJ5 Q52.Q982.QJ.9862 AK6.AT5.A97.AQT4', 'W', 'N');
+    var b = new Board(pbn, 'W', 'N');
     expect(b.ew_tricks).to.equal(0);
     expect(b.ns_tricks).to.equal(0);
     expect(b.player).to.equal('N');
@@ -140,7 +148,7 @@ describe('Board', function() {
   });
 
   it('should undo through tricks', function() {
-    var b = new Board('N:T843.K4.KT853.73 J97.J763.642.KJ5 Q52.Q982.QJ.9862 AK6.AT5.A97.AQT4', 'W', 'N');
+    var b = new Board(pbn, 'W', 'N');
     b.play('N', 'D', 5);
     b.play('E', 'D', 2);
     b.play('S', 'D', 12);
@@ -160,7 +168,7 @@ describe('Board', function() {
   });
 
   it('should find played cards', function() {
-    var b = new Board('N:T843.K4.KT853.73 J97.J763.642.KJ5 Q52.Q982.QJ.9862 AK6.AT5.A97.AQT4', 'W', 'N');
+    var b = new Board(pbn, 'W', 'N');
     b.play('N', 'D', 5);
     b.play('E', 'D', 2);
     b.play('S', 'D', 12);
@@ -177,7 +185,7 @@ describe('Board', function() {
   });
 
   it('should generate PBN', function() {
-    var b = new Board('N:T843.K4.KT853.73 J97.J763.642.KJ5 Q52.Q982.QJ.9862 AK6.AT5.A97.AQT4', 'W', 'N');
+    var b = new Board(pbn, 'W', 'N');
     b.play('N', 'D', 5);
     b.play('E', 'D', 2);
     b.play('S', 'D', 12);
@@ -186,7 +194,7 @@ describe('Board', function() {
   });
 
   it('should find next plays', function() {
-    var b = new Board('N:T843.K4.KT853.73 J97.J763.642.KJ5 Q52.Q982.QJ.9862 AK6.AT5.A97.AQT4', 'W', 'N');
+    var b = new Board(pbn, 'W', 'N');
     b.play('N', 'D', 5);
     b.play('E', 'D', 2);
     b.play('S', 'D', 12);
@@ -202,7 +210,7 @@ describe('Board', function() {
   });
 
   it('should find next plays after a trick', function() {
-    var b = new Board('N:T843.K4.KT853.73 J97.J763.642.KJ5 Q52.Q982.QJ.9862 AK6.AT5.A97.AQT4', 'W', 'N');
+    var b = new Board(pbn, 'W', 'N');
     b.play('N', 'D', 5);
     b.play('E', 'D', 2);
     b.play('S', 'D', 12);
