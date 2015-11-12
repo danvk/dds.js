@@ -91,3 +91,6 @@ table.trick td {
   margin: 2px;
 }
 
+.dd-matrix td {
+  text-align: right;
+}

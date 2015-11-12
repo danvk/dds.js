@@ -543,6 +543,36 @@ class Deal extends React.Component {
   }
 }
 
+class DDMatrix extends React.Component {
+  render() {
+    var m = this.props.matrix;
+    var rows = ['N', 'S', 'E', 'W'].map(p => (
+          <tr key={p}>
+            <td>{p}</td>
+            <td>{m.N[p]}</td>
+            <td>{m.S[p]}</td>
+            <td>{m.H[p]}</td>
+            <td>{m.D[p]}</td>
+            <td>{m.C[p]}</td>
+          </tr>));
+    return (
+      <table className="dd-matrix">
+        <tbody>
+          <tr>
+            <th>{' '}</th>
+            <th className="suit suit-N">NT</th>
+            <th className="suit suit-S">♠</th>
+            <th className="suit suit-H">♥</th>
+            <th className="suit suit-D">♦</th>
+            <th className="suit suit-C">♣</th>
+          </tr>
+          {rows}
+        </tbody>
+      </table>
+    );
+  }
+}
+
 class Explorer extends React.Component {
   constructor(props) {
     super(props);
@@ -575,8 +605,6 @@ class Explorer extends React.Component {
         play.score = 13 - play.score;
       }
     });
-
-    console.log('rerender', board.strain, data);
 
     return {
       [player]: makingPlays
@@ -693,6 +721,7 @@ class Root extends React.Component {
             <option value="W">West</option>
           </select>
         </form>
+        <DDMatrix matrix={calcDDTable(this.state.pbn)} />
         <Explorer board={this.board} />
       </div>
     );
