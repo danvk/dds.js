@@ -1,8 +1,8 @@
-var solve;
+var solveBoard, _calcDDTable;
 var Module = {};
 var ddsReady = new Promise(function(resolve, reject) {
   Module['onRuntimeInitialized'] = function() {
-    resolve(solve);
+    resolve();
   };
 
   var memoryInitializer = 'out.js.mem';
@@ -16,9 +16,10 @@ var ddsReady = new Promise(function(resolve, reject) {
 });
 
 ddsReady = ddsReady.then(function() {
-  solve = Module.cwrap('solve',
-                       'string',
-                       ['string', 'string', 'number', 'number']);
+  solveBoard = Module.cwrap('solve',
+                            'string',
+                            ['string', 'string', 'number', 'number']);
+  _calcDDTable = Module.cwrap('generateDDTable', 'string', ['string']);
 });
 
 var SUITS = {'S': 0, 'H': 1, 'D': 2, 'C': 3};
@@ -52,10 +53,24 @@ function nextPlays(board, trump, plays) {
   if (cacheValue) return cacheValue;
 
   var playsPtr = packPlays(plays);
-  var o = JSON.parse(solve(board, trump, plays.length, playsPtr));
+  var o = JSON.parse(solveBoard(board, trump, plays.length, playsPtr));
   // ... free(playsPtr)
   nextPlays.cache[cacheKey] = o;
   // console.log(cacheKey, cacheValue);
   return o;
 }
 nextPlays.cache = {};
+
+/**
+ * board is a PBN-formatted string (e.g. 'N:AKQJ.T98.76.432 ...')
+ * Returns an object mapping strain -> player -> makeable tricks, e.g.
+ * {'N': {'N': 1, 'S': 2, 'E': 3, 'W': 4}, 'S': { ... }, ...}
+ */
+function calcDDTable(board) {
+  var v = calcDDTable.cache[board];
+  if (v) return v;
+  v = JSON.parse(_calcDDTable(board));
+  calcDDTable.cache[board] = v;
+  return v;
+}
+calcDDTable.cache = {};
