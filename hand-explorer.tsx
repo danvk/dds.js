@@ -1,3 +1,5 @@
+/// <reference path="typings/react/react-global.d.ts" />
+/// <reference path="typings/underscore/underscore.d.ts" />
 // 'N:T843.K4.KT853.73 J97.J763.642.KJ5 Q52.Q982.QJ.9862 AK6.AT5.A97.AQT4'
 
 type Play = {
@@ -8,11 +10,24 @@ type Play = {
 
 type CompleteTrick = {
   leader: string;
-  winner: ?string;
+  winner: string;
   plays: Play[];
 };
 
+// player --> suit --> array of ranks
+type DealType = { [key: string]: { [key: string]: [number] } };
+
 class Board {
+  cards: DealType;
+  lastTrickPBN: string;
+  declarer: string;
+  strain: string;
+  player: string;
+  plays: Play[];
+  tricks: CompleteTrick[];
+  ew_tricks: number;
+  ns_tricks: number;
+
   constructor(pbn: string, declarer: string, strain: string) {
     this.cards = parsePBN(pbn);  // remaining cards in hands
     this.lastTrickPBN = pbn;
@@ -40,7 +55,7 @@ class Board {
       throw `${player} tried to play ${rank} ${suit} which was not in hand.`;
     }
     var legalPlays = this.legalPlays();
-    if (!_.find(legalPlays, {player, suit, rank})) {
+    if (!_.find(legalPlays, _.matches({suit, rank, player}))) {
       throw `${suit} ${rank} by ${player} does not follow suit.`;
     }
 
@@ -89,7 +104,7 @@ class Board {
 
   // Returns an array of {player, suit, rank} objects.
   // TODO: replace this with a call to nextPlays()
-  legalPlays() {
+  legalPlays() : Play[] {
     var player = this.player;
     var followSuit = this.plays.length ? this.plays[0].suit : null;
     if (followSuit && this.cards[player][followSuit].length == 0) {
@@ -165,7 +180,7 @@ class Board {
     }
   }
 
-  indexForCard(suit: string, rank: string): [numer, number] {
+  indexForCard(suit: string, rank: number): [number, number] {
     for (var i = 0; i < this.tricks.length; i++) {
       var plays = this.tricks[i].plays;
       for (var j = 0; j < plays.length; j++) {
@@ -200,7 +215,7 @@ class Board {
     }
   }
 
-  toPBN() {
+  toPBN(): string {
     var player = this.player;
     var holdings = [];
     for (var i = 0; i < 4; i++) {
@@ -259,7 +274,7 @@ var PLAYER_TO_ARROW = {
   'E': '➡'
 };
 
-function parsePBN(pbn: string) {
+function parsePBN(pbn: string): DealType {
   var parts = pbn.split(' ');
   if (parts.length != 4) {
     throw 'PBN must have four hands (got ' + parts.length + ')';
@@ -293,30 +308,33 @@ var SUIT_SYMBOLS = {
   'C': '♣'
 };
 
-/**
- * props:
- *   suit: {'S', 'H', 'D', 'C'}
- *   rank: {'1'..'9', 'T', 'J', 'Q', 'K', 'A'}
- *   making: null | number
- *   facedown: {false, true}
- *   onClick: (suit: string, rank: number) => void
- */
-class Card extends React.Component {
+
+type CardProps = {
+  key?: any;  // Not really a prop! Here for TypeScript.
+  suit: string;  // {'S', 'H', 'D', 'C'}
+  rank: number;  // 2-14
+  making?: number;
+  facedown?: boolean;
+  className?: string;
+  onClick?: (suit: string, rank: string) => void;
+}
+
+class Card extends React.Component<CardProps, void> {
   handleClick() {
     if (this.props.onClick) {
-      this.props.onClick(this.props.suit, this.props.rank);
+      this.props.onClick(this.props.suit, rankToText(this.props.rank));
     }
   }
 
   render() {
     var suit = this.props.suit;
     var suitSym = SUIT_SYMBOLS[suit];
-    var rankSym = this.props.rank;
-    if (rankSym == 'T') rankSym = '10';
-    if (rankSym == 11) rankSym = 'J';
-    if (rankSym == 12) rankSym = 'Q';
-    if (rankSym == 13) rankSym = 'K';
-    if (rankSym == 14) rankSym = 'A';
+    var rank = this.props.rank;
+    var rankSym = '' + rank;
+    if (rank == 11) rankSym = 'J';
+    if (rank == 12) rankSym = 'Q';
+    if (rank == 13) rankSym = 'K';
+    if (rank == 14) rankSym = 'A';
     var className = 'card' + (this.props.className ? ' ' + this.props.className : '');
     if (this.props.facedown) {
       return (
@@ -337,15 +355,14 @@ class Card extends React.Component {
   }
 }
 
-/**
- * props:
- *   hand: { 'S': [4, 9, 13], ... }
- *   enable: 'all' | 'S' | 'H' | 'C' | 'D' | 'none'
- *   oneRow: boolean
- *   making: [{rank, suit, score}]
- *   onClick: (suit: string, rank: number) => void
- */
-class Hand extends React.Component {
+type HandProps = {
+  hand: { [key: string]: number[] };  // { 'S': [4, 9, 13], ... }
+  enable: string;  // 'all' | 'S' | 'H' | 'C' | 'D' | 'none'
+  oneRow?: boolean;
+  making: { rank: string; suit: string; score: string; } [];
+  onClick: (suit: string, rank: number) => void
+}
+class Hand extends React.Component<HandProps, void> {
   handleClick(suit: string, rank: number) {
     var enable = this.props.enable || 'all';
     if (this.props.onClick && (enable == 'all' || enable == suit)) {
@@ -392,15 +409,14 @@ class Hand extends React.Component {
   }
 }
 
-/**
- * props:
- *   plays: [{suit: 'S', rank: 14}, ...]
- *   lead: 'W' | ...
- *   winner: null | 'W' | ...
- *   showArrow: true | false
- *   onClick: (suit: string, rank: number) => void
- */
-class Trick extends React.Component {
+type TrickProps = {
+  plays: { suit: string, rank: number }[];  // [{suit: 'S', rank: 14}, ...]
+  leader: string;  // 'W' | ...
+  winner?: string;  // null | 'W' | ...
+  showArrow: boolean;
+  onClick?: (player: string, suit: string, rank: number) => void;
+}
+class Trick extends React.Component<TrickProps, void> {
   handleClick(player, suit: string, rank: number) {
     if (this.props.onClick) {
       this.props.onClick(player, suit, rank);
@@ -463,7 +479,17 @@ class Trick extends React.Component {
  *
  * TODO: kill legalSuit and use only `making`
  */
-class Deal extends React.Component {
+type DealProps = {
+  deal: DealType;
+  plays: Play[];
+  leader: string; // e.g. 'W'
+  legalSuit: string;  // 'all' | 'S' | 'H' | 'C' | 'D'
+  // {player: [{rank, suit, score}]}
+  making: { [key: string]: { rank: string, suit: string, score: number }[] };
+  onClick?: (player: string, suit: string, rank: number) => void;
+  onUndo?: (player: string, suit: string, rank: number) => void;
+}
+class Deal extends React.Component<DealProps, void> {
   handleClick(player: string, suit: string, rank: number) {
     if (this.props.onClick) {
       this.props.onClick(player, suit, rank);

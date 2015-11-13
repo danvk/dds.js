@@ -63,10 +63,12 @@ var nextPlays = <nextPlaysF>function(board: string, trump: string, plays: string
   var o = JSON.parse(solveBoard(board, trump, plays.length, playsPtr));
   // ... free(playsPtr)
   nextPlays.cache[cacheKey] = o;
+
   // console.log(cacheKey, cacheValue);
   return o;
 }
 nextPlays.cache = {};
+// XXX: calls to nextPlay() aren't type checked
 
 interface calcDDTableF {
   (board: string): any;
