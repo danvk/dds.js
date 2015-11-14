@@ -1,5 +1,8 @@
 // 'N:T843.K4.KT853.73 J97.J763.642.KJ5 Q52.Q982.QJ.9862 AK6.AT5.A97.AQT4'
 
+// to make the page load faster during development
+calcDDTable.cache = {"N:T843.K4.KT853.73 J97.J763.642.KJ5 Q52.Q982.QJ.9862 AK6.AT5.A97.AQT4":{"N":{"N":3,"S":3,"E":9,"W":9},"S":{"N":5,"S":5,"E":8,"W":8},"H":{"N":3,"S":3,"E":9,"W":9},"D":{"N":6,"S":6,"E":7,"W":7},"C":{"N":3,"S":3,"E":9,"W":9}}};
+
 type Play = {
   suit: string;
   rank: number;
@@ -746,15 +749,10 @@ var declarer = 'W';
 var strain = 'N';
 var board = new Board(pbn, declarer, strain);
 
-ddsReady.then(() => {
-  ReactDOM.render(
-    <Root initialPBN={pbn} initialStrain={strain} initialDeclarer={declarer} />,
-    document.getElementById('root')
-  );
-});
+ReactDOM.render(
+  <Root initialPBN={pbn} initialStrain={strain} initialDeclarer={declarer} />,
+  document.getElementById('root')
+);
 
 window.parsePBN = parsePBN;
 window.Board = Board;
-
-// to make the page load faster during development
-calcDDTable.cache = {"N:T843.K4.KT853.73 J97.J763.642.KJ5 Q52.Q982.QJ.9862 AK6.AT5.A97.AQT4":{"N":{"N":3,"S":3,"E":9,"W":9},"S":{"N":5,"S":5,"E":8,"W":8},"H":{"N":3,"S":3,"E":9,"W":9},"D":{"N":6,"S":6,"E":7,"W":7},"C":{"N":3,"S":3,"E":9,"W":9}}};

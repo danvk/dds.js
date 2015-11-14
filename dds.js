@@ -1,20 +1,18 @@
-var solveBoard, _calcDDTable;
-var Module = {};
-var ddsReady = new Promise(function(resolve, reject) {
-  Module['onRuntimeInitialized'] = function() {
-    resolve();
-  };
-  var script = document.createElement('script');
-  script.src = "out.js";
-  document.body.appendChild(script);
-});
-
-ddsReady = ddsReady.then(function() {
-  solveBoard = Module.cwrap('solve',
-                            'string',
-                            ['string', 'string', 'number', 'number']);
-  _calcDDTable = Module.cwrap('generateDDTable', 'string', ['string']);
-});
+/**
+ * JavaScript wrapper for libdds, the bridge double dummy solver.
+ *
+ * To use:
+ *
+ *   <script>
+ *   var Module = {};
+ *   </script>
+ *   <script src="out.js"></script>
+ *   <script src="dds.js"></script>
+ */
+var _solveBoard = Module.cwrap('solve',
+                              'string',
+                              ['string', 'string', 'number', 'number']);
+var _calcDDTable = Module.cwrap('generateDDTable', 'string', ['string']);
 
 var SUITS = {'S': 0, 'H': 1, 'D': 2, 'C': 3};
 var RANKS = {'2': 2, '3': 3, '4': 4, '5': 5, '6': 6,
@@ -47,7 +45,7 @@ function nextPlays(board, trump, plays) {
   if (cacheValue) return cacheValue;
 
   var playsPtr = packPlays(plays);
-  var o = JSON.parse(solveBoard(board, trump, plays.length, playsPtr));
+  var o = JSON.parse(_solveBoard(board, trump, plays.length, playsPtr));
   // ... free(playsPtr)
   nextPlays.cache[cacheKey] = o;
   // console.log(cacheKey, cacheValue);
