@@ -239,7 +239,12 @@ describe('Board', function() {
 });
 
 describe('ibb-to-pbn', function () {
-  it('should load image to canvas', function () {});
+  it('should load image to canvas', function () {
+    return loadImage('ibb/cards.PNG').then(canvas => {
+      expect(canvas.width).to.equal(750);
+      expect(canvas.height).to.equal(1334);
+    });
+  });
   it('should rescale an image', function () {});
   it('should slice image into array of smaller images', function () {});
   it('should binarize a canvas', function () {});
