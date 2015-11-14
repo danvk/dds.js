@@ -4,12 +4,6 @@ var ddsReady = new Promise(function(resolve, reject) {
   Module['onRuntimeInitialized'] = function() {
     resolve();
   };
-
-  var memoryInitializer = 'out.js.mem';
-  var xhr = Module['memoryInitializerRequest'] = new XMLHttpRequest();
-  xhr.open('GET', memoryInitializer, true);
-  xhr.responseType = 'arraybuffer';
-  xhr.send(null);
   var script = document.createElement('script');
   script.src = "out.js";
   document.body.appendChild(script);
