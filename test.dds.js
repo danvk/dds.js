@@ -245,8 +245,24 @@ describe('ibb-to-pbn', function () {
       expect(canvas.height).to.equal(1334);
     });
   });
+
   it('should rescale an image', function () {});
-  it('should slice image into array of smaller images', function () {});
+
+  it('should slice image into array of smaller images', function () {
+    var boxes = {
+      S0: [  0, 1208,  56, 1332],  // 57x125
+      E0: [668,  338, 748,  391]   // 81x54
+    };
+    return loadImage('ibb/cards.PNG').then(canvas => {
+      var slices = sliceImage(canvas, boxes);
+      expect(_.keys(slices)).to.deep.equal(['S0', 'E0']);
+      expect(slices.S0.width).to.equal(57);
+      expect(slices.S0.height).to.equal(125);
+      expect(slices.E0.width).to.equal(81);
+      expect(slices.E0.height).to.equal(54);
+    });
+  });
+
   it('should binarize a canvas', function () {});
   it('should compare a n/s image to a reference', function () {});
   it('should compare a e/w image to a reference', function () {});
