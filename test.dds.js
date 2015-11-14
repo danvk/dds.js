@@ -237,3 +237,12 @@ describe('Board', function() {
     });
   });
 });
+
+describe('ibb-to-pbn', function () {
+  it('should load image to canvas', function () {});
+  it('should rescale an image', function () {});
+  it('should slice image into array of smaller images', function () {});
+  it('should binarize a canvas', function () {});
+  it('should compare a n/s image to a reference', function () {});
+  it('should compare a e/w image to a reference', function () {});
+});
