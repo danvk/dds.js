@@ -1,12 +1,13 @@
-window.loadImage = function(fname) {
+window.loadImage = function (fname) {
   return new Promise((resolve, reject) => {
     var img = document.createElement('img');
     img.src = fname;
     img.onload = function () {
         var c = document.createElement('canvas');
-        c.width = img.width;
-        c.height = img.height;
-        c.getContext("2d").drawImage(img, 0, 0);
+        c.width = 750; // iPhone 6 screenshot size
+        c.height = 1334;
+        c.getContext("2d").drawImage(img, 0, 0, 
+                           750, 1334);
         resolve(c);
     }
   });
@@ -30,4 +31,25 @@ window.sliceImage = function(canvas, boxes) {
                   0, 0, x2 - x1 + 1, y2 - y1 + 1);
     return sliceCanvas;
   });
-}
+};
+
+/* Takes two canvas elements and computes the RMS distance between the two, as rgba pixels
+ * 
+ * Rescales both to be the size of the first one for comparison.
+ * */
+
+window.distanceCanvas = function (canvas1, canvas2) {
+    var arr1 = canvas1.getContext('2d')
+                      .getImageData(0, 0, 
+                         canvas1.width, canvas1.height);
+    var arr2 = canvas2.getContext('2d')
+                      .getImageData(0, 0,
+                         canvas1.width, canvas1.height);
+    var mse = 0;
+    for (var idx = 0; idx != arr1.data.length; idx++)
+    {
+      mse += Math.pow(arr1.data[idx] - arr2.data[idx], 2);
+    }
+    return Math.sqrt(mse);
+};
+

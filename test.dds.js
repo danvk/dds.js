@@ -239,14 +239,20 @@ describe('Board', function() {
 });
 
 describe('ibb-to-pbn', function () {
-  it('should load image to canvas', function () {
+  it('should load an image to canvas', function () {
     return loadImage('ibb/cards.PNG').then(canvas => {
       expect(canvas.width).to.equal(750);
       expect(canvas.height).to.equal(1334);
     });
   });
 
-  it('should rescale an image', function () {});
+  it('should load and rescale an image to canvas', function () {
+    return loadImage('ibb/cards_5S.PNG').then(canvas => {
+      expect(canvas.width).to.equal(750);
+      expect(canvas.height).to.equal(1334);
+    });
+  });
+
 
   it('should slice image into array of smaller images', function () {
     var boxes = {
@@ -263,7 +269,22 @@ describe('ibb-to-pbn', function () {
     });
   });
 
-  it('should binarize a canvas', function () {});
+  it('should return distance of 0 for identical canvases', function () {
+    this.timeout(10000);
+    return loadImage('ibb/cards.PNG').then(canvas => {
+      expect(distanceCanvas(canvas,canvas)).to.equal(0)
+    });
+  });
+
+  it('should return > 0 distance for different canvases', function () {
+    return Promise.all([loadImage('ibb/cards.PNG'), 
+                loadImage('ibb/cards_5S.PNG')])
+             .then(([firstCanvas, secondCanvas]) => {
+               var distance = distanceCanvas(firstCanvas, secondCanvas);
+               expect(distance).to.be.above(0);     
+           });
+  });
+
   it('should compare a n/s image to a reference', function () {});
   it('should compare a e/w image to a reference', function () {});
 });
