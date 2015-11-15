@@ -1,4 +1,4 @@
-window.loadImage = function (fname) {
+function loadImage(fname) {
   return new Promise((resolve, reject) => {
     var img = document.createElement('img');
     img.src = fname;
@@ -19,7 +19,7 @@ window.loadImage = function (fname) {
  * Slices are inclusive on both ends, e.g. x1=1 x2=2 will produce a 2px wide
  *   slice.
  */
-window.sliceImage = function(canvas, boxes) {
+function sliceImage(canvas, boxes) {
   return _.mapObject(boxes, (box, key) => {
     var [x1, y1, x2, y2] = box;
     var sliceCanvas = document.createElement('canvas');
@@ -38,18 +38,19 @@ window.sliceImage = function(canvas, boxes) {
  * Rescales both to be the size of the first one for comparison.
  * */
 
-window.distanceCanvas = function (canvas1, canvas2) {
-    var arr1 = canvas1.getContext('2d')
-                      .getImageData(0, 0, 
-                         canvas1.width, canvas1.height);
-    var arr2 = canvas2.getContext('2d')
-                      .getImageData(0, 0,
-                         canvas1.width, canvas1.height);
-    var mse = 0;
-    for (var idx = 0; idx != arr1.data.length; idx++)
-    {
-      mse += Math.pow(arr1.data[idx] - arr2.data[idx], 2);
-    }
-    return Math.sqrt(mse);
+function distanceCanvas(canvas1, canvas2) {
+  var arr1 = canvas1.getContext('2d')
+                    .getImageData(0, 0, 
+                       canvas1.width, canvas1.height);
+  var arr2 = canvas2.getContext('2d')
+                    .getImageData(0, 0,
+                       canvas1.width, canvas1.height);
+  var mse = 0;
+  for (var idx = 0; idx != arr1.data.length; idx++) {
+    mse += Math.pow(arr1.data[idx] - arr2.data[idx], 2);
+  }
+  return Math.sqrt(mse);
 };
 
+// Export these functions globally for now.
+_.extend(window, {loadImage, sliceImage, distanceCanvas});
