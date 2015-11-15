@@ -11,6 +11,7 @@
   "devDependencies": {
     "babel-core": "^5",
     "chai": "^3.4.1",
+    "http-server": "^0.8.5",
     "mocha": "^2.3.3"
   },
   "scripts": {

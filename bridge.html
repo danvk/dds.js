@@ -11,6 +11,13 @@ var Module = {};
 </script>
 <script src="out.js"></script>
 <script src="dds.js"></script>
+<!-- For development: -->
 <script src="node_modules/babel-core/browser.min.js"></script>
 <script type="text/babel" src="hand-explorer.js"></script>
+
+<!--
+Or, for faster serving:
+babel hand-explorer.js > hand-explorer.es5.js
+<script src="hand-explorer.es5.js"></script>
+-->
 </body>
