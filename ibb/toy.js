@@ -13,12 +13,13 @@ Promise.all([
 
   var recordCard = function(card, position, isNorthBlack) {
     var player = position[0];
-    var rank = Number(position.slice(1));
+    var posNum = Number(position.slice(1));
+    var rank = 14 - posNum;
     var el;
     if (isNorthBlack) {
-      el = {card, suit: nsBlackSuits[player], rank: 2 + rank};
+      el = {card, rank, suit: nsBlackSuits[player]};
     } else {
-      el = {card, suit: nsRedSuits[player], rank: 2 + rank};
+      el = {card, rank, suit: nsRedSuits[player]};
     }
     if (player == 'S' || player == 'N') {
       cardsNS.push(el);
@@ -34,8 +35,8 @@ Promise.all([
     recordCard(card, position, false);
   });
 
-  console.log({
+  window.ref = {
     'EW': cardsEW,
     'NS': cardsNS
-  });
+  };
 });
