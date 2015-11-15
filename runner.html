@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en-us">
 <head>
-  <link href="https://cdn.rawgit.com/mochajs/mocha/2.2.5/mocha.css" rel="stylesheet" />
+  <link href="node_modules/mocha/mocha.css" rel="stylesheet" />
 </head>
 <body>
 <div id='root' style='display: none;'></div>
@@ -9,21 +9,17 @@
 
 <script src="node_modules/react/dist/react.min.js"></script>
 <script src="node_modules/react-dom/dist/react-dom.min.js"></script>
-<!--
 <script>
 var Module = {};
 </script>
 <script src="out.js"></script>
 <script src="dds.js"></script>
--->
 <script src="node_modules/underscore/underscore-min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.23/browser.min.js"></script>
-<!--
 <script type="text/babel" src="hand-explorer.js"></script>
--->
 <script type="text/babel" src="ibb-to-pbn.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/chai/3.4.1/chai.min.js"></script>
-<script src="https://cdn.rawgit.com/mochajs/mocha/2.2.5/mocha.js"></script>
+<script src="node_modules/chai/chai.js"></script>
+<script src="node_modules/mocha/mocha.js"></script>
 <script type="text/babel">mocha.setup('bdd')</script>
 
 <script type="text/babel" src="test.dds.js"></script>
