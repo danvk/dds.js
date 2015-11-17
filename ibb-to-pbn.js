@@ -33,10 +33,12 @@ function sliceImage(canvas, boxes) {
   });
 };
 
-/* Takes two canvas elements and computes the RMS distance between the two, as rgba pixels
+/**
+ * Takes two canvas elements and computes the RMS distance between the two,
+ * as rgba pixels
  * 
  * Rescales both to be the size of the first one for comparison.
- * */
+ */
 
 function distanceCanvas(canvas1, canvas2) {
   var arr1 = canvas1.getContext('2d')
