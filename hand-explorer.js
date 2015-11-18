@@ -680,6 +680,29 @@ class Explorer extends React.Component {
 
 /**
  * props:
+ *   pbn
+ *   onChange
+ * state:
+ *   method: 'manual' | 'acbl' | 'ibb' | 'pbn'
+ */
+class BoardEntry extends React.Component {
+  render() {
+    return (
+      <div>
+        <div className="tabs">
+          <span>Enter Hand:</span>
+          <span className="tab">Manually</span>
+          <span className="tab">ACBL copy/paste</span>
+          <span className="tab">iBridgeBaron Upload</span>
+          <span className="tab">Direct PBN entry</span>
+        </div>
+      </div>
+    );
+  }
+}
+
+/**
+ * props:
  *   initialPBN
  *   initialDeclarer
  *   initialStrain
@@ -690,7 +713,8 @@ class Root extends React.Component {
     this.state = {
       pbn: props.initialPBN,
       strain: props.initialStrain,
-      declarer: props.initialDeclarer
+      declarer: props.initialDeclarer,
+      method: 'pbn'
     };
     this.board = this.makeBoard(this.state);
   }
@@ -731,6 +755,8 @@ class Root extends React.Component {
     var handleFormSubmit = this.handleFormSubmit.bind(this);
     return (
       <div>
+        <BoardEntry pbn={this.state.pbn}
+                    method={this.state.method} />
         <form onSubmit={handleFormSubmit}>
           PBN: <input type="text" size="90" ref="pbn" />
         </form>
