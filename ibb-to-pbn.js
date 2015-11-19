@@ -1,15 +1,18 @@
-function loadImage(fname) {
+/**
+ * Load the image at `path` (relative to the current page).
+ * This returns a Promise for an HTMLImageElement.
+ */
+function loadImage(path) {
   return new Promise((resolve, reject) => {
     var img = document.createElement('img');
-    img.src = fname;
     img.onload = function () {
         var c = document.createElement('canvas');
-        c.width = 750; // iPhone 6 screenshot size
-        c.height = 1334;
-        c.getContext("2d").drawImage(img, 0, 0, 
-                           750, 1334);
+        c.width = img.width;
+        c.height = img.height;
+        c.getContext("2d").drawImage(img, 0, 0);
         resolve(c);
-    }
+    };
+    img.src = path;
   });
 };
 
@@ -33,7 +36,10 @@ function sliceImage(canvas, boxes) {
   });
 };
 
-// takes a canvas and returns a 1d array of whether pixels are foreground.
+/**
+ * takes a canvas and returns a 1d array of whether pixels are foreground.
+ * "foreground" is very specific to iBridgeBaron screenshots.
+ */
 function binarize(canvas) {
   var out = Array(canvas.width * canvas.height);
   var w = canvas.width,
@@ -61,11 +67,6 @@ function binarize(canvas) {
     // 136, 134, 113 = bad
 
     out[n] = (blackErr < 30 || redErr < 50) ? 1 : 0;
-
-    // var abserr = Math.abs(d[i + 0] - 232) +
-    //              Math.abs(d[i + 1] - 236) +
-    //              Math.abs(d[i + 2] - 196);
-    // out[n] = (abserr > 20) ? 1 : 0;
   }
 
   // clear out a 4x4 area around each corner. If there's anything there, it's
@@ -124,6 +125,10 @@ function binaryToCanvas(pixels, width) {
   return canvas;
 }
 
+/**
+ * Shift a binary array representing an image by (dx, dy).
+ * Returns a new array, leaving the original untouched.
+ */
 function binaryShift(pixels, width, dx, dy) {
   if (!(width > 0)) {
     throw `Invalid width: ${width}`;
@@ -168,12 +173,15 @@ function rmse(arr1, arr2) {
 
 /**
  * Find the best matches according to RMSE
+ *
  * targets = Array<{
  *   pixels: number[],
  *   shifts?: Array<number[]>
  *   width: number,
  *   ...
  * }>
+ *
+ * If `shifts` is present, only the lowest RMSE shift is considered.
  */
 function bestMatches(pixels, targets) {
   let scores = targets.map(target => {
@@ -196,6 +204,7 @@ function marginBy(scores, property) {
 }
 
 
+// Convert a numeric rank to a single character PBN rank (e.g. 10 --> 'T').
 function rankToPBN(rank) {
   if (rank >= 2 && rank < 10) return '' + rank;
   else if (rank == 10) return 'T';
@@ -206,11 +215,13 @@ function rankToPBN(rank) {
   throw `Invalid rank: ${rank}`;
 }
 
-// order in which iBridgeBaron displays the suits
+// value order for the suits
 const SUIT_ORDER = {'S': 0, 'H': 1, 'D': 2, 'C': 3};
 
+// Performs sanity checks on the matches structure in recognizeHand.
 // - are all the cards accounted for?
 // - are the hands correctly ordered?
+// Returns a list of errors (or the empty list if it checks out).
 function sanityCheckMatches(matches): string[] {
   var errors = [];
   // Are all the cards matched exactly once?
@@ -256,6 +267,7 @@ function sanityCheckMatches(matches): string[] {
   return errors;
 }
 
+// Convert the matches structure (in recognizeHand) to PBN. North is always first.
 function matchesToPBN(matches) {
   var holdings = [];
   for (let player of ['N', 'E', 'S', 'W']) {
@@ -265,7 +277,7 @@ function matchesToPBN(matches) {
                   .mapObject(cards => cards.map(
                         card => rankToPBN(card.rank)).join(''))
                   .value();
-                  // {S:'KQT9', H:'9876', ...}
+                  // looks like {S:'KQT9', H:'9876', ...}
 
     // We need the empty strings to correctly handle void suits.
     bySuit = _.chain(_.extend({S: '', H: '', D: '', C: ''}, bySuit))
@@ -287,34 +299,40 @@ var slices = {
 };
 
 /**
- * Load reference data. Returns a promise for the references.
+ * Load reference data. Returns a promise for the reference.
  */
 function loadReferenceData(nsBlackPath, nsRedPath) {
   return Promise.all([
     loadImage(nsBlackPath),
     loadImage(nsRedPath)
   ]).then(([blackImage, redImage]) => {
-    var cardsBlackNorth = sliceImage(blackImage, ibbBoxes6);
-    var cardsRedNorth = sliceImage(redImage, ibbBoxes6);
-
+    // NS have all the red cards in one image, all the black in the other.
     var nsBlackSuits = {N: 'S', E: 'D', S: 'C', W: 'H'};
-    var nsRedSuits = {N: 'H', E: 'C', S: 'D', W: 'S'};
+    var nsRedSuits =   {N: 'H', E: 'C', S: 'D', W: 'S'};
 
-    var ranksNS = [];
-    var suitsNS = [];
-    var ranksEW = [];
-    var suitsEW = [];
+    // This is the reference structure which is returned. It contains examples
+    // of what each suit and rank look like in both N/S and E/W positions.
+    var ref = {
+      'NS': {ranks: [], suits: []},
+      'EW': {ranks: [], suits: []}
+    };
 
+    // Add a single card from one of the reference images to the `ref` object.
     var recordCard = function(card, position, isNorthBlack) {
       var player = position[0];
-      var isNS = (player == 'S' || player == 'N');
+      var isNS = (player == 'S' || player == 'N'),
+          side = isNS ? 'NS' : 'EW';
       var posNum = Number(position.slice(1));
       var rank = 14 - posNum;
-      var cardSlices = sliceImage(card, slices[isNS ? 'NS' : 'EW']),
+      var cardSlices = sliceImage(card, slices[side]),
           rankSlice = cardSlices.rank,
           suitSlice = cardSlices.suit;
       var suitPixels = binarize(suitSlice),
           rankPixels = binarize(rankSlice);
+
+      // Only the rank images are shifted. There are enough copies of the suit
+      // images that this isn't needed for them. The N/S images are shifted
+      // left/right while E/W images are shifted up/down.
       var dx = isNS ? 1 : 0,
           dy = isNS ? 0 : 1;
       var shifts = [
@@ -326,33 +344,18 @@ function loadReferenceData(nsBlackPath, nsRedPath) {
       var rankEl = {pixels: rankPixels, shifts, rank, width: rankSlice.width, height: rankSlice.height};
       var suitEl = {suit, pixels: suitPixels, width: suitSlice.width, height: suitSlice.height};
 
-      if (isNS) {
-        ranksNS.push(rankEl);
-        suitsNS.push(suitEl);
-      } else {
-        ranksEW.push(rankEl);
-        suitsEW.push(suitEl);
-      }
+      ref[side].ranks.push(rankEl);
+      ref[side].suits.push(suitEl);
     };
 
+    var cardsBlackNorth = sliceImage(blackImage, ibbBoxes6);
+    var cardsRedNorth = sliceImage(redImage, ibbBoxes6);
     _.each(cardsBlackNorth, (card, position) => {
       recordCard(card, position, true);
     });
     _.each(cardsRedNorth, (card, position) => {
       recordCard(card, position, false);
     });
-
-    var ref = {
-      'EW': {
-        ranks: ranksEW,
-        suits: suitsEW
-      },
-      'NS': {
-        ranks: ranksNS,
-        suits: suitsNS
-      }
-    };
-    window.ref = ref;
 
     return ref;
   });
@@ -373,10 +376,13 @@ function loadReferenceData(nsBlackPath, nsRedPath) {
  * board does not represent a complete hand.
  */
 function recognizeHand(handImage, ref) {
+  var w = handImage.width,
+      h = handImage.height;
+  if (w != 750 || h != 1334) {
+    throw `Invalid screenshot: expected 750x1334, got ${w}x${h}`;
+  }
   console.time('recognizeHand');
   var cards = sliceImage(handImage, ibbBoxes6);
-  var root = document.getElementById('textarea');
-  var div = document.getElementById('root');
 
   var matches = {};
   for (var pos in cards) {
@@ -420,7 +426,7 @@ function recognizeHand(handImage, ref) {
 }
 
 // Export these functions globally for now.
-_.extend(window, {
+_.extend(window, { ibb: {
   loadImage,
   sliceImage,
   rmse,
@@ -434,4 +440,4 @@ _.extend(window, {
   marginBy,
   loadReferenceData,
   recognizeHand
-});
+}});

@@ -6,6 +6,7 @@ chai.config.truncateThreshold = 0;  // disable truncating
 var pbn = 'N:T843.K4.KT853.73 J97.J763.642.KJ5 Q52.Q982.QJ.9862 AK6.AT5.A97.AQT4';
 
 describe('dds', function() {
+
   it('should solve mid-trick', function() {
     var result = nextPlays(pbn, 'N', ['5D', '2D', 'QD'])
     expect(result).to.deep.equal({
@@ -240,6 +241,10 @@ describe('Board', function() {
 });
 
 describe('ibb-to-pbn', function () {
+
+  // Pull in the ibb symbols for testing.
+  var {loadImage, sliceImage, rmse, loadReferenceData, recognizeHand} = window.ibb;
+
   it('should load an image to canvas', function () {
     return loadImage('ibb/cards.PNG').then(canvas => {
       expect(canvas.width).to.equal(750);
@@ -369,7 +374,6 @@ describe('ibb-to-pbn', function () {
       });
     });
   });
-
 
   /*
   TODO(max): add cards_5S.PNG to the project
