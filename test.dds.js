@@ -2,6 +2,7 @@ var expect = chai.expect;
 
 chai.config.truncateThreshold = 0;  // disable truncating
 
+// Board 2 from http://clubresults.acbl.org/Results/232132/2015/11/151102E.HTM
 var pbn = 'N:T843.K4.KT853.73 J97.J763.642.KJ5 Q52.Q982.QJ.9862 AK6.AT5.A97.AQT4';
 
 describe('dds', function() {
@@ -246,13 +247,15 @@ describe('ibb-to-pbn', function () {
     });
   });
 
+  /*
+  TODO(max): add cards_5S.PNG to the project
   it('should load and rescale an image to canvas', function () {
     return loadImage('ibb/cards_5S.PNG').then(canvas => {
       expect(canvas.width).to.equal(750);
       expect(canvas.height).to.equal(1334);
     });
   });
-
+  */
 
   it('should slice image into array of smaller images', function () {
     var boxes = {
@@ -274,6 +277,89 @@ describe('ibb-to-pbn', function () {
     expect(rmse(xs, xs)).to.equal(0);
   });
 
+  describe('recognizeHand', function() {
+    var ref;
+    before(function() {
+      console.log('loading reference...');
+      console.time('loadref');
+      return loadReferenceData('ibb/ns-black.png', 'ibb/ns-red.png')
+        .then(loadedRef => {
+          console.timeEnd('loadref');
+          ref = loadedRef;
+        });
+    });
+
+    it('should recognize an iPhone6 hand', function() {
+      return loadImage('ibb/cards.PNG').then(img => {
+        var m = recognizeHand(img, ref);
+        // Note: PBN is spades/hearts/diamonds/clubs, whereas iBB orders the
+        // hands to alternate red/black.
+        expect(m.pbn).to.equal('N:J86.T832.J76.JT5 ' +
+                                 '95.Q7.KQ854.AK76 ' +
+                                 'T742.J654.A9.942 ' +
+                                 'AKQ3.AK9.T32.Q83');
+        expect(m.errors).to.deep.equal([]);
+        expect(m.margin).to.be.above(0);
+        console.log(m);
+      });
+    });
+
+    it('should recognize another iPhone6 hand', function() {
+      return loadImage('ibb/IMG_0461.PNG').then(img => {
+        var m = recognizeHand(img, ref);
+        expect(m.pbn).to.equal('N:KQJT42.K7.AKJ.T6 ' +
+                                 '85.862.T98742.A4 ' +
+                                 '9763.QJ5.5.J9753 ' +
+                                 'A.AT943.Q63.KQ82');
+        expect(m.errors).to.deep.equal([]);
+        expect(m.margin).to.be.above(0);
+        console.log(m);
+      });
+    });
+
+    it('should recognize a third hand', function() {
+      return loadImage('ibb/hand3.PNG').then(img => {
+        var m = recognizeHand(img, ref);
+        console.log(m);
+        expect(m.errors).to.deep.equal([]);
+        expect(m.margin).to.be.above(0);
+        expect(m.pbn).to.equal('N:T.KJ.KT64.KQJ642 ' +
+                                 'KQJ7543.T3.95.73 ' +
+                                 'A82.842.QJ83.A85 ' +
+                                 '96.AQ9765.A72.T9');
+      });
+    });
+
+    it('should recognize a hand with a void', function() {
+      return loadImage('ibb/hand_with_void.PNG').then(img => {
+        var m = recognizeHand(img, ref);
+        expect(m.pbn).to.equal('N:AKQJ65.AT3.32.KJ ' +
+                                 'T874.J42.84.9864 ' +
+                                 '92.KQ98765.AQ9.A ' +
+                                 '3..KJT765.QT7532');
+        expect(m.errors).to.deep.equal([]);
+        expect(m.margin).to.be.above(0);
+        console.log(m);
+      });
+    });
+
+    it('should recognize a hand with multiple voids', function() {
+      return loadImage('ibb/multiple_voids.PNG').then(img => {
+        var m = recognizeHand(img, ref);
+        console.log(m);
+        expect(m.errors).to.deep.equal([]);
+        expect(m.margin).to.be.above(0);
+        expect(m.pbn).to.equal('N:AQ953.A72.A9754. ' +
+                                 'KJT76.64.832.T87 ' +
+                                 '8.KQJT983..AQ942 ' +
+                                 '42.5.KQJT6.KJ653');
+      });
+    });
+  });
+
+
+  /*
+  TODO(max): add cards_5S.PNG to the project
   it('should return > 0 distance for different canvases', function () {
     return Promise.all([loadImage('ibb/cards.PNG'), 
                 loadImage('ibb/cards_5S.PNG')])
@@ -284,7 +370,5 @@ describe('ibb-to-pbn', function () {
                expect(distance).to.be.above(0);     
            });
   });
-
-  it('should compare a n/s image to a reference', function () {});
-  it('should compare a e/w image to a reference', function () {});
+  */
 });

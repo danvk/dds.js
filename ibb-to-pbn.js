@@ -152,7 +152,7 @@ function binaryShift(pixels, width, dx, dy) {
  */
 function rmse(arr1, arr2) {
   if (arr1.length != arr2.length) {
-    throw 'Size mismatch';
+    throw `Size mismatch ${arr1.length} != ${arr2.length}`;
   }
 
   var mse = 0,
@@ -165,6 +165,37 @@ function rmse(arr1, arr2) {
   return Math.sqrt(mse);
 };
 
+
+/**
+ * Find the best matches according to RMSE
+ * targets = Array<{
+ *   pixels: number[],
+ *   shifts?: Array<number[]>
+ *   width: number,
+ *   ...
+ * }>
+ */
+function bestMatches(pixels, targets) {
+  let scores = targets.map(target => {
+    var score = target.shifts ?
+        _.min(target.shifts.map(shift => rmse(pixels, shift))) :
+        rmse(pixels, target.pixels);
+    return _.extend({}, target, {rmse: score});
+  });
+  return _.sortBy(scores, 'rmse');
+}
+
+/**
+ * Returns the margin by which scores[0].rmse is the best, excluding others for
+ * which scores[*].property is identical to scores[0].property.
+ */
+function marginBy(scores, property) {
+  let best = scores[0].rmse,
+      secondBest = _.find(scores, s => s[property] != scores[0][property]).rmse;
+  return (secondBest - best) / best;
+}
+
+
 function rankToPBN(rank) {
   if (rank >= 2 && rank < 10) return '' + rank;
   else if (rank == 10) return 'T';
@@ -176,16 +207,17 @@ function rankToPBN(rank) {
 }
 
 // order in which iBridgeBaron displays the suits
-const SUIT_ORDER = {'S': 0, 'H': 1, 'C': 2, 'D': 3};
+const SUIT_ORDER = {'S': 0, 'H': 1, 'D': 2, 'C': 3};
 
 // - are all the cards accounted for?
 // - are the hands correctly ordered?
-function sanityCheckMatches(matches) {
+function sanityCheckMatches(matches): string[] {
+  var errors = [];
   // Are all the cards matched exactly once?
   let cardCounts = {};  // e.g. AS
   for (let suit in SUIT_ORDER) {
     for (let rank of _.range(2, 15)) {
-      cardCounts[rankToPBN(rank) + suit] = 0;
+      cardCounts[rankToPBN(rank) + suit] = [];
     }
   }
   for (let playerPos in matches) {
@@ -194,32 +226,34 @@ function sanityCheckMatches(matches) {
         match = matches[playerPos],
         suit = match.suit,
         rank = match.rank;
-    cardCounts[rankToPBN(rank) + suit] += 1;
+    cardCounts[rankToPBN(rank) + suit].push(playerPos);
   }
 
   for (let card in cardCounts) {
-    let count = cardCounts[card];
+    let count = cardCounts[card].length;
     if (count == 0) {
       console.warn(`Missing ${card}`);
     } else if (count > 1) {
-      console.warn(`Multiple matches of ${card} (${count}x)`);
+      var holders = cardCounts[card].join(', ');
+      errors.push(`Multiple matches of ${card} (${holders})`);
     }
   }
 
   // Is everyone's hand in order?
+  // There is no firm ordering of the suits. If a trump suit is set, then the
+  // hands are re-ordered to put it first.
   for (let player of ['N', 'E', 'S', 'W']) {
     for (let pos of _.range(1, 13)) {
       let a = matches[player + (pos - 1)],
-          b = matches[player + pos],
-          aSuit = SUIT_ORDER[a.suit],
-          bSuit = SUIT_ORDER[b.suit];
-      if (aSuit > bSuit || (aSuit == bSuit && a.rank < b.rank)) {
+          b = matches[player + pos];
+      if (a.suit == b.suit && a.rank < b.rank) {
         var aTxt = rankToPBN(a.rank) + a.suit,
             bTxt = rankToPBN(b.rank) + b.suit;
-        console.warn(`${player} is out of order: ${aTxt} < ${bTxt}`);
+        errors.push(`${player} is out of order: ${aTxt} < ${bTxt}`);
       }
     }
   }
+  return errors;
 }
 
 function matchesToPBN(matches) {
@@ -230,7 +264,11 @@ function matchesToPBN(matches) {
                   .groupBy('suit')
                   .mapObject(cards => cards.map(
                         card => rankToPBN(card.rank)).join(''))
+                  .value();
                   // {S:'KQT9', H:'9876', ...}
+
+    // We need the empty strings to correctly handle void suits.
+    bySuit = _.chain(_.extend({S: '', H: '', D: '', C: ''}, bySuit))
                   .pairs()
                   .sortBy(([suit]) => SUIT_ORDER[suit])
                   .map(([suit, text]) => text)
@@ -241,5 +279,159 @@ function matchesToPBN(matches) {
   return 'N:' + holdings.join(' ');
 }
 
+// Boxes to split apart the rank and suit.
+// Recognition works much better when these are done independently.
+var slices = {
+  'NS': {'rank': [0, 0, 51, 59], 'suit': [0, 60, 51, 120]},
+  'EW': {'rank': [0, 0, 41, 50], 'suit': [42, 0, 73, 50]}
+};
+
+/**
+ * Load reference data. Returns a promise for the references.
+ */
+function loadReferenceData(nsBlackPath, nsRedPath) {
+  return Promise.all([
+    loadImage(nsBlackPath),
+    loadImage(nsRedPath)
+  ]).then(([blackImage, redImage]) => {
+    var cardsBlackNorth = sliceImage(blackImage, ibbBoxes6);
+    var cardsRedNorth = sliceImage(redImage, ibbBoxes6);
+
+    var nsBlackSuits = {N: 'S', E: 'D', S: 'C', W: 'H'};
+    var nsRedSuits = {N: 'H', E: 'C', S: 'D', W: 'S'};
+
+    var ranksNS = [];
+    var suitsNS = [];
+    var ranksEW = [];
+    var suitsEW = [];
+
+    var recordCard = function(card, position, isNorthBlack) {
+      var player = position[0];
+      var isNS = (player == 'S' || player == 'N');
+      var posNum = Number(position.slice(1));
+      var rank = 14 - posNum;
+      var cardSlices = sliceImage(card, slices[isNS ? 'NS' : 'EW']),
+          rankSlice = cardSlices.rank,
+          suitSlice = cardSlices.suit;
+      var suitPixels = binarize(suitSlice),
+          rankPixels = binarize(rankSlice);
+      var dx = isNS ? 1 : 0,
+          dy = isNS ? 0 : 1;
+      var shifts = [
+        binaryShift(rankPixels, rankSlice.width, -dx, -dy),
+        rankPixels,
+        binaryShift(rankPixels, rankSlice.width, +dy, +dy)
+      ];
+      var suit = isNorthBlack ? nsBlackSuits[player] : nsRedSuits[player];
+      var rankEl = {pixels: rankPixels, shifts, rank, width: rankSlice.width, height: rankSlice.height};
+      var suitEl = {suit, pixels: suitPixels, width: suitSlice.width, height: suitSlice.height};
+
+      if (isNS) {
+        ranksNS.push(rankEl);
+        suitsNS.push(suitEl);
+      } else {
+        ranksEW.push(rankEl);
+        suitsEW.push(suitEl);
+      }
+    };
+
+    _.each(cardsBlackNorth, (card, position) => {
+      recordCard(card, position, true);
+    });
+    _.each(cardsRedNorth, (card, position) => {
+      recordCard(card, position, false);
+    });
+
+    var ref = {
+      'EW': {
+        ranks: ranksEW,
+        suits: suitsEW
+      },
+      'NS': {
+        ranks: ranksNS,
+        suits: suitsNS
+      }
+    };
+    window.ref = ref;
+
+    return ref;
+  });
+}
+
+/**
+ * Given a screenshot of an iBridgeBaron hand, attempt to recognize the cards.
+ *
+ * Returns:
+ * {
+ *   pbn: string,
+ *   margin: number,
+ *   errors: string[],
+ *   matches: Object[]
+ * }
+ *
+ * Higher margins indicate greater confidence. If errors is non-empty, then the
+ * board does not represent a complete hand.
+ */
+function recognizeHand(handImage, ref) {
+  console.time('recognizeHand');
+  var cards = sliceImage(handImage, ibbBoxes6);
+  var root = document.getElementById('textarea');
+  var div = document.getElementById('root');
+
+  var matches = {};
+  for (var pos in cards) {
+    var player = pos[0];
+    var isNS = (player == 'S' || player == 'N');
+    var cardSlices = sliceImage(cards[pos], slices[isNS ? 'NS' : 'EW']),
+        rankSlice = cardSlices.rank,
+        suitSlice = cardSlices.suit;
+    var suitPixels = binarize(suitSlice),
+        rankPixels = binarize(rankSlice);
+    var refs = isNS ? ref.NS : ref.EW;
+
+    var suitMatches = bestMatches(suitPixels, refs.suits);
+    var rankMatches = bestMatches(rankPixels, refs.ranks);
+
+    matches[pos] = {
+      suit: suitMatches[0].suit,
+      suitStats: {
+        rmse: suitMatches[0].rmse,
+        margin: marginBy(suitMatches, 'suit')
+      },
+      rank: rankMatches[0].rank,
+      rankStats: {
+        rmse: rankMatches[0].rmse,
+        margin: marginBy(rankMatches, 'rank')
+      }
+    };
+  }
+
+  var margin = _.min(_.map(matches,
+        m => Math.min(m.suitStats.margin / m.suitStats.rmse,
+                      m.rankStats.margin / m.rankStats.rmse)));
+
+  console.timeEnd('recognizeHand');
+  return {
+    pbn: matchesToPBN(matches),
+    margin,
+    errors: sanityCheckMatches(matches),
+    matches
+  };
+}
+
 // Export these functions globally for now.
-_.extend(window, {loadImage, sliceImage, rmse, binarize, binaryToCanvas, binaryDiff, binaryShift, matchesToPBN, sanityCheckMatches});
+_.extend(window, {
+  loadImage,
+  sliceImage,
+  rmse,
+  binarize,
+  binaryToCanvas,
+  binaryDiff,
+  binaryShift,
+  matchesToPBN,
+  sanityCheckMatches,
+  bestMatches,
+  marginBy,
+  loadReferenceData,
+  recognizeHand
+});
