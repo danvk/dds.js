@@ -123,7 +123,12 @@ Promise.all([
     var posNum = Number(position.slice(1));
     var rank = 14 - posNum;
     var pixels = binarize(card);
-    var el = {pixels, rank, width: card.width, height: card.height};
+    var shifts = [
+      binaryShift(pixels, card.width, -1, 0),
+      pixels,
+      binaryShift(pixels, card.width, +1, 0)
+    ];
+    var el = {pixels, shifts, rank, width: card.width, height: card.height};
     if (isNorthBlack) {
       _.extend(el, {suit: nsBlackSuits[player]});
     } else {
@@ -135,7 +140,7 @@ Promise.all([
       cardsEW.push(el);
     }
 
-    div.appendChild(binaryToCanvas(el.pixels, el.width));
+    // div.appendChild(binaryToCanvas(el.pixels, el.width));
   };
 
   _.each(cardsBlackNorth, (card, position) => {
@@ -173,6 +178,7 @@ Promise.all([
   return loadImage('cards.PNG').then(img => {
     var cards = sliceImage(img, ibbBoxes6);
     var root = document.getElementById('textarea');
+    var div = document.getElementById('root');
     var html = '\t';
     for (var {suit,rank} of ref.NS) {
       html += `${suit}${rank}\t`;
@@ -183,10 +189,26 @@ Promise.all([
       root.innerHTML += pos;
       var pixels = binarize(cards[pos]);
       for (var refCard of ref.NS) {
-        var e = rmse(pixels, refCard.pixels);
-        root.innerHTML += `\t${e}`;
+        var minE = 1;
+        var es = [];
+        for (var shift of refCard.shifts) {
+          var e = rmse(pixels, shift);
+          minE = Math.min(e, minE);
+          es.push(e);
+        }
+        root.innerHTML += `\t${minE}`;
       }
       root.innerHTML += '\n';
     }
+
+    // for (var dx of [-1, 0, 1]) {
+    //   var s0 = cards.S0,
+    //       bs0 = binaryShift(binarize(s0), s0.width, dx, 0),
+    //       ref10S = _.find(ref.NS, {rank: 10, suit: 'S'});
+    //   div.appendChild(binaryToCanvas(bs0, s0.width));
+    //   div.appendChild(binaryToCanvas(ref10S.pixels, ref10S.width));
+    //   div.appendChild(binaryToCanvas(binaryDiff(bs0, ref10S.pixels), s0.width));
+    //   div.appendChild(document.createElement('br'));
+    // }
   });
 });

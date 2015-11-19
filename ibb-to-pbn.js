@@ -80,7 +80,32 @@ function binarize(canvas) {
     }
   }
 
+  // also the border; this can have 1px lines which mess things up.
+  // for (var x = 0; x < w; x++) {
+  //   zero(x, 0);
+  //   zero(x, h - 1);
+  // }
+  // for (var y = 0; y < h; y++) {
+  //   zero(0, y);
+  //   zero(w - 1, y);
+  // }
+
   return out;
+}
+
+/**
+ * Returns a new binary array which is 1 where a and b differ.
+ */
+function binaryDiff(a, b) {
+  if (a.length != b.length) {
+    throw `Length mismatch: ${a.length} != ${b.length}`;
+  }
+
+  var d = Array(a.length);
+  for (var i = 0; i < a.length; i++) {
+    d[i] = a[i] != b[i] ? 1 : 0;
+  }
+  return d;
 }
 
 /**
@@ -109,6 +134,29 @@ function binaryToCanvas(pixels, width) {
   return canvas;
 }
 
+function binaryShift(pixels, width, dx, dy) {
+  if (!(width > 0)) {
+    throw `Invalid width: ${width}`;
+  }
+  if (pixels.length % width != 0) {
+    throw `Invalid width: ${width} does not divide ${pixels.length}`;
+  }
+  var height = pixels.length / width;
+  var out = Array(pixels.length);
+  for (var i = 0; i < out.length; i++) out[i] = 0;
+
+  for (var y = 0; y < height; y++) {
+    var ny = y + dy;
+    if (ny < 0 || ny >= height) continue;
+    for (var x = 0; x < width; x++) {
+      var nx = x + dx;
+      if (nx < 0 || nx >= width) continue;
+      out[ny * width + nx] = pixels[y * width + x];
+    }
+  }
+  return out;
+}
+
 /**
  * Calculates the RMSE between two arrays.
  */
@@ -128,4 +176,4 @@ function rmse(arr1, arr2) {
 };
 
 // Export these functions globally for now.
-_.extend(window, {loadImage, sliceImage, rmse, binarize, binaryToCanvas});
+_.extend(window, {loadImage, sliceImage, rmse, binarize, binaryToCanvas, binaryDiff, binaryShift});
