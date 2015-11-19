@@ -112,7 +112,7 @@ Promise.all([
   var cardsRedNorth = sliceImage(redImage, ibbBoxes6);
 
   var nsBlackSuits = {N: 'S', E: 'D', S: 'C', W: 'H'};
-  var nsRedSuits = {N: 'H', E: 'C', S: 'S', W: 'S'};
+  var nsRedSuits = {N: 'H', E: 'C', S: 'D', W: 'S'};
 
   var cardsNS = [];
   var cardsEW = [];
@@ -122,10 +122,11 @@ Promise.all([
     var posNum = Number(position.slice(1));
     var rank = 14 - posNum;
     var el;
+    var pixels = binarize(card);
     if (isNorthBlack) {
-      el = {card, rank, suit: nsBlackSuits[player]};
+      el = {pixels, rank, suit: nsBlackSuits[player]};
     } else {
-      el = {card, rank, suit: nsRedSuits[player]};
+      el = {pixels, rank, suit: nsRedSuits[player]};
     }
     if (player == 'S' || player == 'N') {
       cardsNS.push(el);
@@ -141,11 +142,14 @@ Promise.all([
     recordCard(card, position, false);
   });
 
-  window.ref = {
+  var ref = {
     'EW': cardsEW,
     'NS': cardsNS
   };
+  window.ref = ref;
+  return ref;
 
+  /*
   var root = document.getElementById('root');
   var keys = _.keys(cardsEW);
   var i = 0;
@@ -160,4 +164,25 @@ Promise.all([
   };
 
   update();
+  */
+}).then(ref => {
+  return loadImage('cards.PNG').then(img => {
+    var cards = sliceImage(img, ibbBoxes6);
+    var root = document.getElementById('textarea');
+    var html = '\t';
+    for (var {suit,rank} of ref.NS) {
+      html += `${suit}${rank}\t`;
+    }
+    root.innerHTML = html + '\n';
+    for (var pos in cards) {
+      if (pos[0] == 'E' || pos[0] == 'W') continue;
+      root.innerHTML += pos;
+      var pixels = binarize(cards[pos]);
+      for (var refCard of ref.NS) {
+        var e = rmse(pixels, refCard.pixels);
+        root.innerHTML += `\t${e}`;
+      }
+      root.innerHTML += '\n';
+    }
+  });
 });
