@@ -44,8 +44,10 @@ function nextPlays(board, trump, plays) {
   var cacheValue = nextPlays.cache[cacheKey];
   if (cacheValue) return cacheValue;
 
+  console.time('SolveBoard');
   var playsPtr = packPlays(plays);
   var o = JSON.parse(_solveBoard(board, trump, plays.length, playsPtr));
+  console.timeEnd('SolveBoard');
   // ... free(playsPtr)
   nextPlays.cache[cacheKey] = o;
   // console.log(cacheKey, cacheValue);
@@ -61,7 +63,9 @@ nextPlays.cache = {};
 function calcDDTable(board) {
   var v = calcDDTable.cache[board];
   if (v) return v;
+  console.time('CalcDDTable');
   v = JSON.parse(_calcDDTable(board));
+  console.timeEnd('CalcDDTable');
   calcDDTable.cache[board] = v;
   return v;
 }

@@ -355,6 +355,19 @@ describe('ibb-to-pbn', function () {
                                  '42.5.KQJT6.KJ653');
       });
     });
+
+    it('should recongize a fun hand', function() {
+      return loadImage('ibb/maybe_sacrifice.PNG').then(img => {
+        var m = recognizeHand(img, ref);
+        console.log(m);
+        expect(m.errors).to.deep.equal([]);
+        expect(m.margin).to.be.above(0);
+        expect(m.pbn).to.equal('N:.KJT75.8654.QJT2 ' +
+                                 'QJT9853..K.K9543 ' +
+                                 '4.AQ9832.AJ932.A ' +
+                                 'AK762.64.QT7.876');
+      });
+    });
   });
 
 
