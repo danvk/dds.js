@@ -33,26 +33,42 @@ function sliceImage(canvas, boxes) {
   });
 };
 
-/**
- * Takes two canvas elements and computes the RMS distance between the two,
- * as rgba pixels
- * 
- * Rescales both to be the size of the first one for comparison.
- */
+// 4,4,4 = black
+// 232,236,196 = background
+// 229,0,28 = red
 
-function distanceCanvas(canvas1, canvas2) {
-  var arr1 = canvas1.getContext('2d')
-                    .getImageData(0, 0, 
-                       canvas1.width, canvas1.height);
-  var arr2 = canvas2.getContext('2d')
-                    .getImageData(0, 0,
-                       canvas1.width, canvas1.height);
-  var mse = 0;
-  for (var idx = 0; idx != arr1.data.length; idx++) {
-    mse += Math.pow(arr1.data[idx] - arr2.data[idx], 2);
+// takes a canvas and returns a 1d array of whether pixels are foreground.
+function binarize(canvas) {
+  var out = Array(canvas.width * canvas.height);
+  var w = canvas.width,
+      h = canvas.height,
+      d = canvas.getContext('2d').getImageData(0, 0, w, h).data;
+  for (var i = 0, n = 0; i < d.length; i+=4, n++) {
+    var abserr = Math.abs(d[i + 0] - 232) +
+                 Math.abs(d[i + 1] - 236) +
+                 Math.abs(d[i + 2] - 196);
+    out[n] = (abserr > 20) ? 1 : 0;
   }
+  return out;
+}
+
+/**
+ * Calculates the RMSE between two arrays.
+ */
+function rmse(arr1, arr2) {
+  if (arr1.length != arr2.length) {
+    throw 'Size mismatch';
+  }
+
+  var mse = 0,
+      n = arr1.length;
+  for (var i = 0; i < n; i++) {
+    var v = arr1[i] - arr2[i];
+    mse += v * v;
+  }
+  mse /= n;
   return Math.sqrt(mse);
 };
 
 // Export these functions globally for now.
-_.extend(window, {loadImage, sliceImage, distanceCanvas});
+_.extend(window, {loadImage, sliceImage, rmse, binarize});

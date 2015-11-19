@@ -269,18 +269,18 @@ describe('ibb-to-pbn', function () {
     });
   });
 
-  it('should return distance of 0 for identical canvases', function () {
-    this.timeout(10000);
-    return loadImage('ibb/cards.PNG').then(canvas => {
-      expect(distanceCanvas(canvas,canvas)).to.equal(0)
-    });
+  it('should return distance of 0 for identical arrays', function () {
+    var xs = [0, 1, 2, 3, 4, 1, 9];
+    expect(rmse(xs, xs)).to.equal(0);
   });
 
   it('should return > 0 distance for different canvases', function () {
     return Promise.all([loadImage('ibb/cards.PNG'), 
                 loadImage('ibb/cards_5S.PNG')])
              .then(([firstCanvas, secondCanvas]) => {
-               var distance = distanceCanvas(firstCanvas, secondCanvas);
+               var px1 = binarize(firstCanvas),
+                   px2 = binarize(secondCanvas);
+               var distance = rmse(px1, px2);
                expect(distance).to.be.above(0);     
            });
   });
