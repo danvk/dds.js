@@ -120,13 +120,16 @@ Promise.all([
 
   var recordCard = function(card, position, isNorthBlack) {
     var player = position[0];
+    var isNS = (player == 'S' || player == 'N');
     var posNum = Number(position.slice(1));
     var rank = 14 - posNum;
     var pixels = binarize(card);
+    var dx = isNS ? 1 : 0,
+        dy = isNS ? 0 : 1;
     var shifts = [
-      binaryShift(pixels, card.width, -1, 0),
+      binaryShift(pixels, card.width, -dx, -dy),
       pixels,
-      binaryShift(pixels, card.width, +1, 0)
+      binaryShift(pixels, card.width, +dy, +dy)
     ];
     var el = {pixels, shifts, rank, width: card.width, height: card.height};
     if (isNorthBlack) {
@@ -134,13 +137,11 @@ Promise.all([
     } else {
       _.extend(el, {suit: nsRedSuits[player]});
     }
-    if (player == 'S' || player == 'N') {
+    if (isNS) {
       cardsNS.push(el);
     } else {
       cardsEW.push(el);
     }
-
-    // div.appendChild(binaryToCanvas(el.pixels, el.width));
   };
 
   _.each(cardsBlackNorth, (card, position) => {
@@ -157,23 +158,6 @@ Promise.all([
   window.ref = ref;
 
   return ref;
-
-  /*
-  var root = document.getElementById('root');
-  var keys = _.keys(cardsEW);
-  var i = 0;
-
-  var update = () => {
-    root.innerHTML = '';
-    root.appendChild(cardsNS[keys[i]].card);
-    root.appendChild(cardsEW[keys[i]].card);
-
-    i = (i + 1) % keys.length;
-    window.setTimeout(update, 100);
-  };
-
-  update();
-  */
 }).then(ref => {
   return loadImage('cards.PNG').then(img => {
     var cards = sliceImage(img, ibbBoxes6);
@@ -184,31 +168,50 @@ Promise.all([
       html += `${suit}${rank}\t`;
     }
     root.innerHTML = html + '\n';
+    var matches = {};
     for (var pos in cards) {
-      if (pos[0] == 'E' || pos[0] == 'W') continue;
-      root.innerHTML += pos;
+      var player = pos[0];
+      var isNS = (player == 'S' || player == 'N');
+      var refs = isNS ? ref.NS : ref.EW;
+      // root.innerHTML += pos;
       var pixels = binarize(cards[pos]);
-      for (var refCard of ref.NS) {
+      var scores = [];
+      for (var refCard of refs) {
         var minE = 1;
-        var es = [];
         for (var shift of refCard.shifts) {
           var e = rmse(pixels, shift);
           minE = Math.min(e, minE);
-          es.push(e);
         }
-        root.innerHTML += `\t${minE}`;
+        scores.push({suit: refCard.suit, rank: refCard.rank, rmse: minE});
+        // root.innerHTML += `\t${minE}`;
       }
-      root.innerHTML += '\n';
+      scores = _.sortBy(scores, 'rmse').slice(0, 2);
+      // root.innerHTML += '\n';
+      matches[pos] = _.extend(scores[0], {
+          margin: scores[1].rmse - scores[0].rmse,
+          alt: { suit: scores[1].suit, rank: scores[1].rank }
+      });
     }
 
-    // for (var dx of [-1, 0, 1]) {
-    //   var s0 = cards.S0,
-    //       bs0 = binaryShift(binarize(s0), s0.width, dx, 0),
-    //       ref10S = _.find(ref.NS, {rank: 10, suit: 'S'});
-    //   div.appendChild(binaryToCanvas(bs0, s0.width));
-    //   div.appendChild(binaryToCanvas(ref10S.pixels, ref10S.width));
-    //   div.appendChild(binaryToCanvas(binaryDiff(bs0, ref10S.pixels), s0.width));
-    //   div.appendChild(document.createElement('br'));
-    // }
+    /*
+    for (var dx of [-1, 0, 1]) {
+      var s0 = cards.S0,
+          bs0 = binaryShift(binarize(s0), s0.width, dx, 0),
+          ref10S = _.find(ref.NS, {rank: 10, suit: 'S'});
+      div.appendChild(binaryToCanvas(bs0, s0.width));
+      div.appendChild(binaryToCanvas(ref10S.pixels, ref10S.width));
+      div.appendChild(binaryToCanvas(binaryDiff(bs0, ref10S.pixels), s0.width));
+      div.appendChild(document.createElement('br'));
+    }
+    */
+    return matches;
+  }).then(matches => {
+    // sanity checks:
+    // - are all the cards accounted for?
+    // - are the hands correctly ordered?
+    console.log(matches);
+    window.matches = matches;
+    sanityCheckMatches(matches);
+    console.log(matchesToPBN(matches));
   });
 });

@@ -35,9 +35,6 @@ function sliceImage(canvas, boxes) {
 
 // takes a canvas and returns a 1d array of whether pixels are foreground.
 function binarize(canvas) {
-  // 4,4,4 = black
-  // 232,236,196 = background
-  // 229,0,28 = red
   var out = Array(canvas.width * canvas.height);
   var w = canvas.width,
       h = canvas.height,
@@ -48,6 +45,9 @@ function binarize(canvas) {
         g = d[i + 1],
         b = d[i + 2];
 
+    // 0,0,0 = black
+    // 232,236,196 = background
+    // 229,0,28 = red
     var blackErr = (r + g + b) / 3,
         redErr = (Math.abs(r - 229) + g + Math.abs(b - 28)) / 3;
 
@@ -79,16 +79,6 @@ function binarize(canvas) {
       zero(w - 1 - x, h - 1 - y);
     }
   }
-
-  // also the border; this can have 1px lines which mess things up.
-  // for (var x = 0; x < w; x++) {
-  //   zero(x, 0);
-  //   zero(x, h - 1);
-  // }
-  // for (var y = 0; y < h; y++) {
-  //   zero(0, y);
-  //   zero(w - 1, y);
-  // }
 
   return out;
 }
@@ -175,5 +165,81 @@ function rmse(arr1, arr2) {
   return Math.sqrt(mse);
 };
 
+function rankToPBN(rank) {
+  if (rank >= 2 && rank < 10) return '' + rank;
+  else if (rank == 10) return 'T';
+  else if (rank == 11) return 'J';
+  else if (rank == 12) return 'Q';
+  else if (rank == 13) return 'K';
+  else if (rank == 14) return 'A';
+  throw `Invalid rank: ${rank}`;
+}
+
+// order in which iBridgeBaron displays the suits
+const SUIT_ORDER = {'S': 0, 'H': 1, 'C': 2, 'D': 3};
+
+// - are all the cards accounted for?
+// - are the hands correctly ordered?
+function sanityCheckMatches(matches) {
+  // Are all the cards matched exactly once?
+  let cardCounts = {};  // e.g. AS
+  for (let suit in SUIT_ORDER) {
+    for (let rank of _.range(2, 15)) {
+      cardCounts[rankToPBN(rank) + suit] = 0;
+    }
+  }
+  for (let playerPos in matches) {
+    let player = playerPos[0],
+        pos = Number(playerPos.slice(1)),
+        match = matches[playerPos],
+        suit = match.suit,
+        rank = match.rank;
+    cardCounts[rankToPBN(rank) + suit] += 1;
+  }
+
+  for (let card in cardCounts) {
+    let count = cardCounts[card];
+    if (count == 0) {
+      console.warn(`Missing ${card}`);
+    } else if (count > 1) {
+      console.warn(`Multiple matches of ${card} (${count}x)`);
+    }
+  }
+
+  // Is everyone's hand in order?
+  for (let player of ['N', 'E', 'S', 'W']) {
+    for (let pos of _.range(1, 13)) {
+      let a = matches[player + (pos - 1)],
+          b = matches[player + pos],
+          aSuit = SUIT_ORDER[a.suit],
+          bSuit = SUIT_ORDER[b.suit];
+      if (aSuit > bSuit || (aSuit == bSuit && a.rank < b.rank)) {
+        var aTxt = rankToPBN(a.rank) + a.suit,
+            bTxt = rankToPBN(b.rank) + b.suit;
+        console.warn(`${player} is out of order: ${aTxt} < ${bTxt}`);
+      }
+    }
+  }
+}
+
+function matchesToPBN(matches) {
+  var holdings = [];
+  for (let player of ['N', 'E', 'S', 'W']) {
+    var bySuit = _.chain(_.range(0, 13))
+                  .map(pos => matches[player + pos])
+                  .groupBy('suit')
+                  .mapObject(cards => cards.map(
+                        card => rankToPBN(card.rank)).join(''))
+                  // {S:'KQT9', H:'9876', ...}
+                  .pairs()
+                  .sortBy(([suit]) => SUIT_ORDER[suit])
+                  .map(([suit, text]) => text)
+                  .join('.')
+                  .value();
+    holdings.push(bySuit);
+  }
+  return 'N:' + holdings.join(' ');
+}
+
 // Export these functions globally for now.
-_.extend(window, {loadImage, sliceImage, rmse, binarize, binaryToCanvas, binaryDiff, binaryShift});
+_.extend(window, {loadImage, sliceImage, rmse, binarize, binaryToCanvas, binaryDiff, binaryShift, matchesToPBN, sanityCheckMatches});
