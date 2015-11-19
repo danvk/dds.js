@@ -108,6 +108,7 @@ Promise.all([
   loadImage('ns-black.png'),
   loadImage('ns-red.png')
 ]).then(([blackImage, redImage]) => {
+  var div = document.getElementById('root');
   var cardsBlackNorth = sliceImage(blackImage, ibbBoxes6);
   var cardsRedNorth = sliceImage(redImage, ibbBoxes6);
 
@@ -121,18 +122,20 @@ Promise.all([
     var player = position[0];
     var posNum = Number(position.slice(1));
     var rank = 14 - posNum;
-    var el;
     var pixels = binarize(card);
+    var el = {pixels, rank, width: card.width, height: card.height};
     if (isNorthBlack) {
-      el = {pixels, rank, suit: nsBlackSuits[player]};
+      _.extend(el, {suit: nsBlackSuits[player]});
     } else {
-      el = {pixels, rank, suit: nsRedSuits[player]};
+      _.extend(el, {suit: nsRedSuits[player]});
     }
     if (player == 'S' || player == 'N') {
       cardsNS.push(el);
     } else {
       cardsEW.push(el);
     }
+
+    div.appendChild(binaryToCanvas(el.pixels, el.width));
   };
 
   _.each(cardsBlackNorth, (card, position) => {
@@ -147,6 +150,7 @@ Promise.all([
     'NS': cardsNS
   };
   window.ref = ref;
+
   return ref;
 
   /*
