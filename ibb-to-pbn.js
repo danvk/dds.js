@@ -243,7 +243,7 @@ function sanityCheckMatches(matches): string[] {
   for (let card in cardCounts) {
     let count = cardCounts[card].length;
     if (count == 0) {
-      console.warn(`Missing ${card}`);
+      errors.push(`Missing ${card}`);
     } else if (count > 1) {
       var holders = cardCounts[card].join(', ');
       errors.push(`Multiple matches of ${card} (${holders})`);

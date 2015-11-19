@@ -373,6 +373,20 @@ describe('ibb-to-pbn', function () {
                                  'AK762.64.QT7.876');
       });
     });
+
+    it('should fail to recognize a closed hand', function() {
+      return loadImage('ibb/ew_closed.PNG').then(img => {
+        var m = recognizeHand(img, ref);
+        console.log(m);
+        // Comes out as:
+        // N:872.7542.85.8652 .TTTTQQQTTTT..TT KJ5.AQT8.AKT.AK3 J.QQQQQQQQQQQQ..
+        expect(m.errors).to.have.length.above(0);
+        expect(m.margin).to.be.below(0.01);  // should be really low, anyway.
+        // It should get the N/S holdings correct, at least.
+        expect(m.pbn.slice(0, 18)).to.equal('N:872.7542.85.8652');
+        expect(m.pbn.slice(36, 52)).to.equal( 'KJ5.AQT8.AKT.AK3');
+      });
+    });
   });
 
   /*
