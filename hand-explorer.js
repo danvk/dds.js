@@ -16,12 +16,12 @@ type CompleteTrick = {
 };
 
 class Board {
-  constructor(pbn: string, declarer: string, strain: string) {
+  constructor(pbn: string, strain: string) {
     this.cards = parsePBN(pbn);  // remaining cards in hands
     this.lastTrickPBN = pbn;
-    this.declarer = declarer;
+    this.firstPlayer = pbn[0];  // first to play comes directly from PBN.
     this.strain = strain;  // e.g. spades or no trump ('H', 'S', 'N', ...)
-    this.player = NEXT_PLAYER[declarer];  // next to play
+    this.player = this.firstPlayer;  // next to play
     this.plays = [];  // plays in this trick
     this.tricks = [];  // previous tricks. Array of CompleteTrick.
     this.ew_tricks = 0;
@@ -119,6 +119,10 @@ class Board {
     return _.flatten(_.map(cards, (ranks, suit) => ranks.map(rank => ({suit, rank}))));
   }
 
+  getDeclarer(): string {
+    return NEXT_PLAYER[NEXT_PLAYER[NEXT_PLAYER[this.firstPlayer]]];
+  }
+
   // Undo the last play
   undo() {
     var prevTricks = this.tricks.length,
@@ -152,7 +156,7 @@ class Board {
     this.sortHands();
 
     // reset tricks & player
-    this.player = NEXT_PLAYER[this.declarer];
+    this.player = this.firstPlayer;
     this.tricks = [];
     this.plays = [];
     this.ew_tricks = 0;
@@ -262,7 +266,9 @@ var PLAYER_TO_ARROW = {
   'E': '➡'
 };
 
-function parsePBN(pbn: string) {
+// Given a PBN string, return a player -> string holding mapping, e.g.
+// {N: 'AKQJ.984...', ...}
+function parsePBNStrings(pbn: string): {[key: string]: string} {
   var parts = pbn.split(' ');
   if (parts.length != 4) {
     throw 'PBN must have four hands (got ' + parts.length + ')';
@@ -272,10 +278,21 @@ function parsePBN(pbn: string) {
   if (!m) {
     throw 'PBN must start with either "N:", "S:", "E:" or "W:"';
   }
-  var player = m[1];
-  var deal = {};
   parts[0] = parts[0].slice(2);
+  var player = m[1];
+  var hands = {};
   parts.forEach((txt, i) => {
+    hands[player] = txt;
+    player = NEXT_PLAYER[player];
+  });
+  return hands;
+}
+
+function parsePBN(pbn: string) {
+  var textHands = parsePBNStrings(pbn);
+
+  var deal = {};
+  _.each(textHands, (txt, player) => {
     deal[player] = {};
     var suits = txt.split('.');
     if (suits.length != 4) {
@@ -284,9 +301,23 @@ function parsePBN(pbn: string) {
     suits.forEach((holding, idx) => {
       deal[player][SUITS[idx]] = [].map.call(holding, textToRank);
     });
-    player = NEXT_PLAYER[player];
   });
   return deal;
+}
+
+// Rotate the PBN string so that firstPlayer is first.
+function rotatePBN(pbn, firstPlayer) {
+  if (firstPlayer.length != 1 || 'NSEW'.indexOf(firstPlayer) == -1) {
+    throw `Invalid player: ${firstPlayer}`;
+  }
+  var textHands = parsePBNStrings(pbn);
+  var player = firstPlayer;
+  var hands = [];
+  do {
+    hands.push(textHands[player]);
+    player = NEXT_PLAYER[player];
+  } while (player != firstPlayer);
+  return firstPlayer + ':' + hands.join(' ');
 }
 
 var SUIT_SYMBOLS = {
@@ -628,7 +659,7 @@ class Explorer extends React.Component {
       return [{suit, rank, score}].concat(equals.map(rank => ({suit, rank, score})));
     })).map(({suit, rank, score}) => ({suit, rank: textToRank(rank), score}));
     makingPlays.forEach(play => {
-      if (onSameTeam(player, board.declarer)) {
+      if (onSameTeam(player, board.getDeclarer())) {
         play.score += (player == 'E' || player == 'W') ? board.ew_tricks : board.ns_tricks;
       } else {
         play.score += (player == 'E' || player == 'W') ? board.ew_tricks : board.ns_tricks;
@@ -756,7 +787,8 @@ class Root extends React.Component {
   }
 
   makeBoard(state) {
-    return new Board(state.pbn, state.declarer, state.strain);
+    var pbn = rotatePBN(state.pbn, NEXT_PLAYER[state.declarer]);
+    return new Board(pbn, state.strain);
   }
 
   componentDidMount() {
@@ -796,15 +828,19 @@ class Root extends React.Component {
   }
 }
 
-var pbn = 'N:T843.K4.KT853.73 J97.J763.642.KJ5 Q52.Q982.QJ.9862 AK6.AT5.A97.AQT4';
-var declarer = 'W';
-var strain = 'N';
-var board = new Board(pbn, declarer, strain);
-
-ReactDOM.render(
-  <Root initialPBN={pbn} initialStrain={strain} initialDeclarer={declarer} />,
-  document.getElementById('root')
-);
-
 window.parsePBN = parsePBN;
+window.rotatePBN = rotatePBN;
 window.Board = Board;
+
+var root = document.getElementById('root');
+if (root) {
+  var pbn = 'N:T843.K4.KT853.73 J97.J763.642.KJ5 Q52.Q982.QJ.9862 AK6.AT5.A97.AQT4';
+  var strain = 'N';
+  var declarer = 'W';
+  var board = new Board(pbn, strain);
+
+  ReactDOM.render(
+    <Root initialPBN={pbn} initialStrain={strain} initialDeclarer={declarer} />,
+    root
+  );
+}

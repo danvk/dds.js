@@ -32,10 +32,10 @@ describe('dds', function() {
 
 describe('Board', function() {
   it('should play a card', function() {
-    var b = new Board(pbn, 'W', 'N');
+    var b = new Board(pbn, 'N');
     expect(b.ew_tricks).to.equal(0);
     expect(b.ns_tricks).to.equal(0);
-    expect(b.declarer).to.equal('W');
+    expect(b.getDeclarer()).to.equal('W');
     expect(b.strain).to.equal('N');
     expect(b.tricks).to.be.empty;
 
@@ -65,7 +65,7 @@ describe('Board', function() {
   });
 
   it('should play a trick', function() {
-    var b = new Board(pbn, 'W', 'N');
+    var b = new Board(pbn, 'N');
     b.play('N', 'D', 5);
     b.play('E', 'D', 2);
     b.play('S', 'D', 12);
@@ -90,7 +90,7 @@ describe('Board', function() {
   });
 
   it('should determine legal plays', function() {
-    var b = new Board(pbn, 'W', 'N');
+    var b = new Board(pbn, 'N');
     b.play('N', 'D', 5);
 
     expect(b.legalPlays()).to.deep.equal([
@@ -110,7 +110,7 @@ describe('Board', function() {
   });
 
   it('should throw on illegal plays', function() {
-    var b = new Board(pbn, 'W', 'N');
+    var b = new Board(pbn, 'N');
     b.play('N', 'D', 5);
     expect(() => {
       b.play('E', 'C', 5);
@@ -118,7 +118,7 @@ describe('Board', function() {
   });
 
   it('should undo moves', function() {
-    var b = new Board(pbn, 'W', 'N');
+    var b = new Board(pbn, 'N');
     expect(b.ew_tricks).to.equal(0);
     expect(b.ns_tricks).to.equal(0);
     expect(b.player).to.equal('N');
@@ -150,7 +150,7 @@ describe('Board', function() {
   });
 
   it('should undo through tricks', function() {
-    var b = new Board(pbn, 'W', 'N');
+    var b = new Board(pbn, 'N');
     b.play('N', 'D', 5);
     b.play('E', 'D', 2);
     b.play('S', 'D', 12);
@@ -170,7 +170,7 @@ describe('Board', function() {
   });
 
   it('should find played cards', function() {
-    var b = new Board(pbn, 'W', 'N');
+    var b = new Board(pbn, 'N');
     b.play('N', 'D', 5);
     b.play('E', 'D', 2);
     b.play('S', 'D', 12);
@@ -187,7 +187,7 @@ describe('Board', function() {
   });
 
   it('should generate PBN', function() {
-    var b = new Board(pbn, 'W', 'N');
+    var b = new Board(pbn, 'N');
     b.play('N', 'D', 5);
     b.play('E', 'D', 2);
     b.play('S', 'D', 12);
@@ -196,7 +196,7 @@ describe('Board', function() {
   });
 
   it('should find next plays', function() {
-    var b = new Board(pbn, 'W', 'N');
+    var b = new Board(pbn, 'N');
     b.play('N', 'D', 5);
     b.play('E', 'D', 2);
     b.play('S', 'D', 12);
@@ -212,7 +212,7 @@ describe('Board', function() {
   });
 
   it('should find next plays after a trick', function() {
-    var b = new Board(pbn, 'W', 'N');
+    var b = new Board(pbn, 'N');
     b.play('N', 'D', 5);
     b.play('E', 'D', 2);
     b.play('S', 'D', 12);
@@ -237,6 +237,12 @@ describe('Board', function() {
         { suit: 'C', rank: '6', equals: [], score: 2 }
       ]
     });
+  });
+
+  it('should rotate a PBN string', function() {
+    // 'N:T843.K4.KT853.73 J97.J763.642.KJ5 Q52.Q982.QJ.9862 AK6.AT5.A97.AQT4'
+    expect(rotatePBN(pbn, 'E')).to.equal(
+      'E:J97.J763.642.KJ5 Q52.Q982.QJ.9862 AK6.AT5.A97.AQT4 T843.K4.KT853.73');
   });
 });
 
