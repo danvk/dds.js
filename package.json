@@ -15,7 +15,9 @@
     "mocha": "^2.3.3"
   },
   "scripts": {
-    "test": "mocha"
+    "test": "mocha",
+    "http-server": "http-server",
+    "watch": "babel --verbose --watch hand-explorer.js ibb-to-pbn.js --out-file all.es5.js"
   },
   "repository": {
     "type": "git",

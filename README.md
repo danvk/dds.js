@@ -5,10 +5,14 @@ See it in action [here][1]
 
 ## Development
 
-To iterate on the demo, install its dependencies and start an http server:
+To iterate on the demo, first install its dependencies:
 
     npm install
-    ./node_modules/.bin/http-server
+
+then generate browser-friendly code and start an http-server
+
+    npm run watch
+    npm run http-server
 
 and open up `http://localhost:8080/bridge.html`.
 

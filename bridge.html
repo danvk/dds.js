@@ -3,6 +3,11 @@
 <link rel="stylesheet" href="bridge.css" />
 <body>
 <div id='root'>Loading&hellip;</div>
+<div id="preloaded-images">
+<img src="ibb/ns-black.png">
+<img src="ibb/ns-red.png">
+</div>
+
 <script src="node_modules/react/dist/react.min.js"></script>
 <script src="node_modules/react-dom/dist/react-dom.min.js"></script>
 <script src="node_modules/underscore/underscore-min.js"></script>
@@ -11,13 +16,11 @@ var Module = {};
 </script>
 <script src="out.js"></script>
 <script src="dds.js"></script>
-<!-- For development: -->
-<script src="node_modules/babel-core/browser.min.js"></script>
-<script type="text/babel" src="hand-explorer.js"></script>
+<script src="ibb/cards.js"></script>
 
 <!--
-Or, for faster serving:
-babel hand-explorer.js > hand-explorer.es5.js
-<script src="hand-explorer.es5.js"></script>
+To (continually) generate this file:
+npm run watch
 -->
+<script src="all.es5.js"></script>
 </body>
