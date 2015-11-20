@@ -14,7 +14,7 @@ then generate browser-friendly code and start an http-server
     npm run watch
     npm run http-server
 
-and open up `http://localhost:8080/bridge.html`.
+and open up `http://localhost:8080/`.
 
 To run/iterate on the tests, open `http://localhost:8080/runner.html`.
 
