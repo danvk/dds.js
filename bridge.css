@@ -105,3 +105,7 @@ table.trick td {
   font-weight: bold;
   background: lightblue;
 }
+
+#preloaded-images {
+  display: none;
+}

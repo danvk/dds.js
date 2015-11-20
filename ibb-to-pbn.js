@@ -298,10 +298,17 @@ var slices = {
   'EW': {'rank': [0, 0, 41, 50], 'suit': [42, 0, 73, 50]}
 };
 
+var cachedReference = {};
+
 /**
  * Load reference data. Returns a promise for the reference.
  */
 function loadReferenceData(nsBlackPath, nsRedPath) {
+  var cacheKey = nsBlackPath + ' ' + nsRedPath;
+  if (cacheKey in cachedReference) {
+    return Promise.resolve(cachedReference[cacheKey]);
+  }
+
   return Promise.all([
     loadImage(nsBlackPath),
     loadImage(nsRedPath)
@@ -357,6 +364,7 @@ function loadReferenceData(nsBlackPath, nsRedPath) {
       recordCard(card, position, false);
     });
 
+    cachedReference[cacheKey] = ref;
     return ref;
   });
 }

@@ -678,6 +678,36 @@ class Explorer extends React.Component {
   }
 }
 
+// Given a file object from a FileList, return a Promise for an
+// HTMLImageElement.
+function loadUploadedImage(file) {
+  return new Promise(function(resolve, reject) {
+    var reader = new FileReader();
+    reader.onloadend = function () {
+      var image = new Image();
+      image.onload = function () {
+        var width = image.width,
+            height = image.height;
+        console.log('Image dimensions: ', width, 'x', height);
+        resolve(image);
+      };
+
+      image.onerror = function () {
+        console.error('There was an error processing your file!');
+        reject('There was an error processing your file!');
+      };
+      
+      image.src = reader.result;
+    };
+    reader.onerror = function () {
+      console.error('There was an error reading the file!');
+      reject('There was an error reading the file!');
+    };
+
+    reader.readAsDataURL(file);
+  });
+}
+
 /**
  * props:
  *   initialPBN
@@ -700,6 +730,24 @@ class Root extends React.Component {
     e.preventDefault();
     this.setState({
       pbn: this.refs.pbn.value
+    });
+  }
+
+  handleUpload(e: SyntheticEvent) {
+    var file = e.target.files[0];
+    Promise.all([
+      ibb.loadReferenceData('ibb/ns-black.png', 'ibb/ns-red.png'),
+      loadUploadedImage(file)])
+    .then(([ref, img]) => {
+      var hand = ibb.recognizeHand(img, ref);
+      if (hand.errors.length) {
+        console.warn('Unable to recognize iBridgeBaron hand', hand.errors);
+        return;
+      }
+
+      this.setState({pbn: hand.pbn});
+    }).catch(error => {
+      alert(error);
     });
   }
 
@@ -728,11 +776,15 @@ class Root extends React.Component {
   }
 
   render() {
-    var handleFormSubmit = this.handleFormSubmit.bind(this);
+    var handleFormSubmit = this.handleFormSubmit.bind(this),
+        handleUpload = this.handleUpload.bind(this);
     return (
       <div>
         <form onSubmit={handleFormSubmit}>
           PBN: <input type="text" size="90" ref="pbn" />
+        </form>
+        <form onChange={handleUpload}>
+          Upload iBridgeBaron Screenshot: <input ref="ibb" type="file" accept="image/*" />
         </form>
         <DDMatrix matrix={calcDDTable(this.state.pbn)}
                   declarer={this.state.declarer} 
