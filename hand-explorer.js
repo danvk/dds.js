@@ -813,10 +813,10 @@ class Root extends React.Component {
     return (
       <div>
         <form onSubmit={handleFormSubmit}>
-          PBN: <input type="text" size="90" ref="pbn" />
+          PBN: <input type="text" size="70" ref="pbn" />
         </form>
         <form onChange={handleUpload}>
-          Upload iBridgeBaron Screenshot: <input ref="ibb" type="file" accept="image/*" />
+          iBridgeBaron: <input ref="ibb" type="file" accept="image/*" />
         </form>
         <DDMatrix matrix={calcDDTable(this.state.pbn)}
                   declarer={this.state.declarer} 
