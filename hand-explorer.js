@@ -838,7 +838,6 @@ if (root) {
   var pbn = 'N:T843.K4.KT853.73 J97.J763.642.KJ5 Q52.Q982.QJ.9862 AK6.AT5.A97.AQT4';
   var strain = 'N';
   var declarer = 'W';
-  var board = new Board(pbn, strain);
 
   ReactDOM.render(
     <Root initialPBN={pbn} initialStrain={strain} initialDeclarer={declarer} />,

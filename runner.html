@@ -24,6 +24,12 @@ var Module = {};
 <script src="node_modules/mocha/mocha.js"></script>
 <script type="text/babel">mocha.setup('bdd')</script>
 
+<!--
+
+TODO: Use babel --watch for this file, too.
+The in-browser transformer can result in different behavior.
+
+-->
 <script type="text/babel" src="test.dds.js"></script>
 <script type="text/babel">
 mocha.run();

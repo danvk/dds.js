@@ -9,6 +9,7 @@
  *   <script src="out.js"></script>
  *   <script src="dds.js"></script>
  */
+(function() {
 var _solveBoard = Module.cwrap('solve',
                               'string',
                               ['string', 'string', 'number', 'number']);
@@ -50,7 +51,7 @@ function nextPlays(board, trump, plays) {
   console.timeEnd('SolveBoard');
   // ... free(playsPtr)
   nextPlays.cache[cacheKey] = o;
-  // console.log(cacheKey, cacheValue);
+  // console.log(cacheKey, o);
   return o;
 }
 nextPlays.cache = {};
@@ -70,3 +71,8 @@ function calcDDTable(board) {
   return v;
 }
 calcDDTable.cache = {};
+
+window.calcDDTable = calcDDTable;
+window.nextPlays = nextPlays;
+
+})();

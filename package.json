@@ -17,7 +17,7 @@
   "scripts": {
     "test": "mocha",
     "http-server": "http-server",
-    "watch": "babel --verbose --watch hand-explorer.js ibb-to-pbn.js --out-file all.es5.js"
+    "watch": "babel --verbose --source-maps true --watch hand-explorer.js ibb-to-pbn.js --out-file all.es5.js"
   },
   "repository": {
     "type": "git",
