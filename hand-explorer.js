@@ -831,6 +831,7 @@ class Root extends React.Component {
 window.parsePBN = parsePBN;
 window.rotatePBN = rotatePBN;
 window.Board = Board;
+window.Root = Root;
 
 var root = document.getElementById('root');
 if (root) {
