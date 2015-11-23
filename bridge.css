@@ -109,3 +109,17 @@ table.trick td {
 #preloaded-images {
   display: none;
 }
+
+.hand-builder {
+  border: 1px solid black;
+}
+.
+.hand-builder .player {
+  cursor: pointer;
+}
+.hand-builder .selected {
+  font-weight: bold;
+}
+.hand-builder .assigned-cards > div {
+  min-height: 43px;
+}

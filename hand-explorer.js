@@ -15,6 +15,11 @@ type CompleteTrick = {
   plays: Play[];
 };
 
+type CardType = {
+  suit: string;
+  rank: number;
+}
+
 class Board {
   constructor(pbn: string, strain: string) {
     this.cards = parsePBN(pbn);  // remaining cards in hands
@@ -709,6 +714,105 @@ class Explorer extends React.Component {
   }
 }
 
+// TODO:
+// - order hands
+// - limit hands to 13 cards
+// - click to unassign card
+// - last hand gets auto-filled
+// - a more table-like layout
+// - fire onDone()
+
+/**
+ * props:
+ *   onDone: (pbn: string) => void
+ */
+class HandBuilder extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      // These are all CardType[]
+      hands: {
+        N: [],
+        S: [],
+        E: [],
+        W: []
+      },
+      player: 'N'
+    };
+  }
+
+  // Returns remaining cards grouped by suit.
+  remainingCards(): {[key:string]: number[]} {
+    var cards = _.chain(this.state.hands)
+            .values()
+            .flatten()
+            .groupBy('suit')
+            .value();
+
+    return _.chain(_.extend({S:[], H: [], C: [], D: []}, cards))
+            .mapObject(cards => _.pluck(cards, 'rank'))
+            .mapObject(cards => _.difference(_.range(2, 15), cards))
+            .value();
+  }
+
+  assignCard(suit: string, rank: number) {
+    this.state.hands[this.state.player].push({suit, rank});
+    this.forceUpdate();
+  }
+
+  makeCardList(cards: CardType[]): Card[] {
+    return cards.map(c => <Card key={c.suit + c.rank}
+                                suit={c.suit}
+                                rank={c.rank} />);
+  }
+
+  unassignedCards(suit: string, ranks: number[]): Card[] {
+    var assign = this.assignCard.bind(this);
+    return ranks.map(r => <Card key={suit + r} suit={suit} rank={r} onClick={assign}/>);
+  }
+
+  render() {
+    var remainingCards = this.remainingCards();
+    var classes = {
+      N: 'player ' + (this.state.player == 'N' ? 'selected' : ''),
+      S: 'player ' + (this.state.player == 'S' ? 'selected' : ''),
+      E: 'player ' + (this.state.player == 'E' ? 'selected' : ''),
+      W: 'player ' + (this.state.player == 'W' ? 'selected' : '')
+    };
+    var selectPlayer = player => (() => { this.setState({player}); });
+
+    return (
+      <div className='hand-builder'>
+        <div className='remaining-cards'>
+          <div>S: {this.unassignedCards('S', remainingCards.S)}</div>
+          <div>H: {this.unassignedCards('H', remainingCards.H)}</div>
+          <div>C: {this.unassignedCards('C', remainingCards.C)}</div>
+          <div>D: {this.unassignedCards('D', remainingCards.D)}</div>
+        </div>
+        <hr />
+        <div className='assigned-cards'>
+          <div>
+            <span onClick={selectPlayer('N')} className={classes.N}>North</span>:
+            {this.makeCardList(this.state.hands.N)}
+          </div>
+          <div>
+            <span onClick={selectPlayer('W')} className={classes.W}>West</span>:
+            {this.makeCardList(this.state.hands.W)}
+          </div>
+          <div>
+            {this.makeCardList(this.state.hands.E)}
+            <span onClick={selectPlayer('E')} className={classes.E}>East</span>
+          </div>
+          <div>
+            {this.makeCardList(this.state.hands.S)}
+            <span onClick={selectPlayer('S')} className={classes.S}>South</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+}
+
 // Given a file object from a FileList, return a Promise for an
 // HTMLImageElement.
 function loadUploadedImage(file) {
@@ -818,6 +922,7 @@ class Root extends React.Component {
         <form onChange={handleUpload}>
           iBridgeBaron: <input ref="ibb" type="file" accept="image/*" />
         </form>
+        <HandBuilder />
         <DDMatrix matrix={calcDDTable(this.state.pbn)}
                   declarer={this.state.declarer} 
                   strain={this.state.strain}
