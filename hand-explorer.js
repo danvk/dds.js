@@ -32,7 +32,7 @@ var Board = (function () {
             throw player + " tried to play " + rank + " " + suit + " which was not in hand.";
         }
         var legalPlays = this.legalPlays();
-        if (!_.find(legalPlays, { player: player, suit: suit, rank: rank })) {
+        if (!_.find(legalPlays, _.matches({ suit: suit, rank: rank, player: player }))) {
             throw suit + " " + rank + " by " + player + " does not follow suit.";
         }
         this.cards[player][suit].splice(idx, 1);

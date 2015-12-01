@@ -15,7 +15,18 @@ type CompleteTrick = {
 };
 
 // player --> suit --> array of ranks
-type DealType = { [key: string]: { [key: string]: [number] } };
+type Holding = {
+  S: number[],
+  H: number[],
+  D: number[],
+  C: number[]
+};
+type DealType = {
+  N: Holding,
+  S: Holding,
+  E: Holding,
+  W: Holding
+};
 
 class Board {
   cards: DealType;
@@ -285,7 +296,7 @@ function parsePBN(pbn: string): DealType {
     throw 'PBN must start with either "N:", "S:", "E:" or "W:"';
   }
   var player = m[1];
-  var deal = {};
+  var deal: DealType = {};
   parts[0] = parts[0].slice(2);
   parts.forEach((txt, i) => {
     deal[player] = {};
