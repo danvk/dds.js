@@ -3,7 +3,6 @@ importScripts('out.js', 'dds.js');
 
 onmessage = function(e) {
   var data = e.data;
-  console.log('Received message', data);
   switch (data.action) {
     case 'nextPlays':
       result = nextPlays.apply(null, data.params);
