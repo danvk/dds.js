@@ -9,7 +9,7 @@
  *   <script src="out.js"></script>
  *   <script src="dds.js"></script>
  */
-(function() {
+(function(window) {
 var _solveBoard = Module.cwrap('solve',
                               'string',
                               ['string', 'string', 'number', 'number']);
@@ -75,4 +75,4 @@ calcDDTable.cache = {};
 window.calcDDTable = calcDDTable;
 window.nextPlays = nextPlays;
 
-})();
+})(this);
