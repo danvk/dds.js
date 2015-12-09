@@ -634,6 +634,11 @@ class DDMatrix extends React.Component {
   }
 }
 
+/**
+ * props:
+ * - board
+ * - onChange
+ */
 class Explorer extends React.Component {
   constructor(props) {
     super(props);
@@ -643,11 +648,13 @@ class Explorer extends React.Component {
     var board = this.props.board;
     board.play(player, suit, rank);
     this.forceUpdate();
+    if (this.props.onChange) this.props.onChange();
   }
 
   handleUndo(player: string, suit: string, rank: number) {
     this.props.board.undoToCard(suit, rank);
     this.forceUpdate();
+    if (this.props.onChange) this.props.onChange();
   }
 
   // Returns a {player -> [{suit, rank, score}, ...]} object.
@@ -744,6 +751,7 @@ function loadUploadedImage(file) {
  *   initialPBN
  *   initialDeclarer
  *   initialStrain
+ *   initialPlays
  */
 class Root extends React.Component {
   constructor(props) {
@@ -754,6 +762,9 @@ class Root extends React.Component {
       declarer: props.initialDeclarer
     };
     this.board = this.makeBoard(this.state);
+    for (let play of props.initialPlays) {
+      this.board.play(this.board.player, play.suit, play.rank);
+    }
   }
 
   // Update in response to form changes.
@@ -805,6 +816,24 @@ class Root extends React.Component {
 
   updateUI() {
     this.refs.pbn.value = this.state.pbn;
+    this.setURL();
+  }
+
+  setURL() {
+    let board = this.board;
+    let plays = _.flatten(board.tricks.map(t => t.plays).concat(board.plays));
+    let params = {
+      strain: this.state.strain,
+      declarer: this.state.declarer,
+      plays: plays.map(({suit,rank}) => rankToText(rank) + suit).join(','),
+      deal: this.state.pbn
+    };
+    let queryString = _.map(params, (v, k) => k + '=' + v).join('&');
+    history.replaceState({}, '', '?' + queryString.replace(/ /g, '+'));
+  }
+
+  boardDidUpdate() {
+    this.setURL();
   }
 
   render() {
@@ -822,10 +851,35 @@ class Root extends React.Component {
                   declarer={this.state.declarer} 
                   strain={this.state.strain}
                   onClick={this.handleDDClick.bind(this)} />
-        <Explorer board={this.board} />
+        <Explorer board={this.board}
+                  onChange={this.boardDidUpdate.bind(this)} />
       </div>
     );
   }
+}
+
+// Via http://stackoverflow.com/a/2880929/388951
+function parseQueryString() {
+  var match,
+      pl     = /\+/g,  // Regex for replacing addition symbol with a space
+      search = /([^&=]+)=?([^&]*)/g,
+      decode = function (s) { return decodeURIComponent(s.replace(pl, " ")); },
+      query  = window.location.search.substring(1);
+
+  var urlParams = {};
+  while (match = search.exec(query)) {
+   urlParams[decode(match[1])] = decode(match[2]);
+  }
+  return urlParams;
+}
+
+function parsePlays(playsStr: string) {
+  if (!playsStr) return [];
+  return playsStr.split(',')
+                 .map(play => ({
+                   rank: textToRank(play[0]),
+                   suit: play[1]
+                 }));
 }
 
 window.parsePBN = parsePBN;
@@ -835,12 +889,19 @@ window.Root = Root;
 
 var root = document.getElementById('root');
 if (root) {
-  var pbn = 'N:T843.K4.KT853.73 J97.J763.642.KJ5 Q52.Q982.QJ.9862 AK6.AT5.A97.AQT4';
-  var strain = 'N';
-  var declarer = 'W';
+  var params = parseQueryString();
+  var pbn = 'N:T843.K4.KT853.73 J97.J763.642.KJ5 Q52.Q982.QJ.9862 AK6.AT5.A97.AQT4' || params.deal.replace(/\+/g, ' ');
+  var strain = 'N' || params.strain;
+  var declarer = 'W' || params.declarer;
+  var plays = parsePlays(params.plays) || [];
+  console.log(params);
+  console.log(plays);
 
   ReactDOM.render(
-    <Root initialPBN={pbn} initialStrain={strain} initialDeclarer={declarer} />,
+    <Root initialPBN={pbn}
+          initialStrain={strain}
+          initialDeclarer={declarer}
+          initialPlays={plays} />,
     root
   );
 }
