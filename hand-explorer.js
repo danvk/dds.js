@@ -32,6 +32,10 @@ class Board {
     return this.plays.length ? this.plays[0].player : this.player;
   }
 
+  isCompleted(): boolean {
+    return this.ew_tricks + this.ns_tricks == 13;
+  }
+
   // Play a card
   play(player: string, suit: string, rank: number) {
     if (player != this.player) {
@@ -326,6 +330,45 @@ var SUIT_SYMBOLS = {
   'D': '♦',
   'C': '♣'
 };
+
+
+const SUIT_RANKS = {'S': 0, 'H': 1, 'D': 2, 'C': 3};
+
+// Comparator for card ranks.
+function compareCards(a: {suit: string, rank: number},
+                      b: {suit: string, rank: number}): number {
+  if (a.suit != b.suit) {
+    return SUIT_RANKS[a.suit] - SUIT_RANKS[b.suit];
+  } else {
+    return a.rank - b.rank;
+  }
+}
+
+/**
+ * Play out all remaining tricks on a board using min/max.
+ * This is done asynchronously. Calls the callback after each play.
+ * Returns a Promise which is resolved after the last play is completed.
+ */
+function autoPlay(b: Board, cb: ()=>void): Promise {
+  return new Promise((resolve, reject) => {
+    let declarer = b.getDeclarer();
+    var iterate = () => {
+      if (b.isCompleted()) {
+        resolve();
+        return;
+      }
+
+      let plays = b.nextPlays().plays.map(x => _.extend({}, x, {rank: textToRank(x.rank)}));
+      plays.sort((a, b) => -compareCards(a, b));
+      plays = _.sortBy(plays, p => -p.score);
+      let p = plays[0];
+      b.play(b.player, p.suit, p.rank);
+      cb();
+      window.requestAnimationFrame(iterate);
+    };
+    window.requestAnimationFrame(iterate);
+  });
+}
 
 /**
  * props:
@@ -807,7 +850,9 @@ class Root extends React.Component {
   }
 
   componentWillUpdate(nextProps, nextState) {
-    this.board = this.makeBoard(nextState);
+    if (!_.isEqual(this.state, nextState)) {
+      this.board = this.makeBoard(nextState);
+    }
   }
 
   componentDidUpdate() {
@@ -836,6 +881,13 @@ class Root extends React.Component {
     this.setURL();
   }
 
+  autoPlay() {
+    autoPlay(this.board, () => {
+      this.forceUpdate();
+    }).then(() => {
+    });
+  }
+
   render() {
     var handleFormSubmit = this.handleFormSubmit.bind(this),
         handleUpload = this.handleUpload.bind(this);
@@ -847,6 +899,7 @@ class Root extends React.Component {
         <form onChange={handleUpload}>
           iBridgeBaron: <input ref="ibb" type="file" accept="image/*" />
         </form>
+        <button onClick={this.autoPlay.bind(this)}>Autoplay</button>
         <DDMatrix matrix={calcDDTable(this.state.pbn)}
                   declarer={this.state.declarer} 
                   strain={this.state.strain}
