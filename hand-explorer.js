@@ -708,7 +708,7 @@ class Explorer extends React.Component {
   getMaking(board: Board) {
     var data = board.nextPlays();
     var player = data.player;
-    var makingPlays = _.flatten(data.plays.map(({suit, rank, score, equals}) => {
+    var makingPlays = _.flatten((data.plays || []).map(({suit, rank, score, equals}) => {
       return [{suit, rank, score}].concat(equals.map(rank => ({suit, rank, score})));
     })).map(({suit, rank, score}) => ({suit, rank: textToRank(rank), score}));
     makingPlays.forEach(play => {
@@ -740,17 +740,18 @@ class Explorer extends React.Component {
     var legalSuit = legalSuits.length == 1 ? legalSuits[0] : 'all';
 
     var making = this.getMaking(board);
-
-    return (
-      <div>
+    var deal = board.isCompleted() ? null : 
         <Deal deal={board.cards}
               plays={board.plays}
               leader={board.leader()}
               legalSuit={legalSuit}
               making={making}
               onClick={this.handleClick.bind(this)}
-              onUndo={handleUndo}
-              />
+              onUndo={handleUndo} />;
+
+    return (
+      <div>
+        {deal}
         <div className="score">
           <p>{board.ns_tricks} North-South</p>
           <p>{board.ew_tricks} East-West</p>
@@ -951,8 +952,6 @@ if (root) {
   var strain = 'N' || params.strain;
   var declarer = 'W' || params.declarer;
   var plays = parsePlays(params.plays) || [];
-  console.log(params);
-  console.log(plays);
 
   ReactDOM.render(
     <Root initialPBN={pbn}
