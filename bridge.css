@@ -6,6 +6,7 @@
 .card {
   border: 1px solid black;
   border-radius: 2px;
+  background: white;
   position: relative;
 
   width: 24px;
@@ -41,7 +42,7 @@
 }
 
 .card.lead {
-  background: yellow;
+  background: #ffff99;
 }
 
 .deal {
@@ -85,6 +86,12 @@ table.trick {
 }
 table.trick td {
   min-width: 30px;
+}
+table.trick.positive {
+  background: #efe;
+}
+table.trick.negative {
+  background: #fee;
 }
 
 .previous-tricks > table.trick {

@@ -475,6 +475,7 @@ class Hand extends React.Component {
  *   lead: 'W' | ...
  *   winner: null | 'W' | ...
  *   showArrow: true | false
+ *   isPositiveTrick: true | false | undefined
  *   onClick: (suit: string, rank: number) => void
  */
 class Trick extends React.Component {
@@ -499,9 +500,11 @@ class Trick extends React.Component {
       player = NEXT_PLAYER[player];
     }
     var arrow = this.props.showArrow ? PLAYER_TO_ARROW[player] : ' ';
+    var isPositiveTrick = this.props.isPositiveTrick,
+        backgroundClass = isPositiveTrick === true ? 'positive' : isPositiveTrick === false ? 'negative' : '';
 
     return (
-      <table className="trick">
+      <table className={'trick ' + backgroundClass}>
         <tbody>
           <tr>
             <td colSpan={3} className="north-trick">
@@ -730,6 +733,7 @@ class Explorer extends React.Component {
                              plays={trick.plays}
                              leader={trick.leader}
                              winner={trick.winner}
+                             isPositiveTrick={onSameTeam(trick.winner, board.getDeclarer())}
                              onClick={handleUndo} />);
     var legalPlays = board.legalPlays();
     var legalSuits = _.uniq(_.pluck(legalPlays, 'suit'));
