@@ -948,9 +948,9 @@ window.Root = Root;
 var root = document.getElementById('root');
 if (root) {
   var params = parseQueryString();
-  var pbn = 'N:T843.K4.KT853.73 J97.J763.642.KJ5 Q52.Q982.QJ.9862 AK6.AT5.A97.AQT4' || params.deal.replace(/\+/g, ' ');
-  var strain = 'N' || params.strain;
-  var declarer = 'W' || params.declarer;
+  var pbn = params.deal ? params.deal.replace(/\+/g, ' ') : 'N:T843.K4.KT853.73 J97.J763.642.KJ5 Q52.Q982.QJ.9862 AK6.AT5.A97.AQT4';
+  var strain = params.strain || 'N';
+  var declarer = params.declarer || 'W';
   var plays = parsePlays(params.plays) || [];
 
   ReactDOM.render(
