@@ -1,0 +1,736 @@
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <style>
+      h1 {
+        margin-bottom: 0;
+      }
+      .board {
+        display: inline-block;
+        width: 45%;
+        margin-bottom: 0.5em;
+      }
+    </style>
+  </head>
+  <h1>North</h1><div class="player"><p class="board"><b>Board 1</b><br>
+♠ A K J 6 <span style="color:red">♥</span> 9 6 5 <span style="color:red">♦</span> A Q J 5 ♣ 5 3 
+<br>Dealer: North
+<br>Vulnerable: None
+</p>
+<p class="board"><b>Board 2</b><br>
+♠ A K 6 2 <span style="color:red">♥</span> 8 7 2 <span style="color:red">♦</span> K 10 5 3 ♣ K 2 
+<br>Dealer: East
+<br>Vulnerable: NS
+</p>
+<p class="board"><b>Board 3</b><br>
+♠ 10 7 2 <span style="color:red">♥</span> 10 4 <span style="color:red">♦</span> A J 10 8 6 2 ♣ A 5 
+<br>Dealer: South
+<br>Vulnerable: EW
+</p>
+<p class="board"><b>Board 4</b><br>
+♠ A Q 9 5 <span style="color:red">♥</span> Q 10 7 3 <span style="color:red">♦</span> Q 5 4 ♣ J 8 
+<br>Dealer: West
+<br>Vulnerable: All
+</p>
+<p class="board"><b>Board 5</b><br>
+♠ K 7 6 5 4 <span style="color:red">♥</span> A K Q 3 <span style="color:red">♦</span> 8 3 ♣ 7 3 
+<br>Dealer: North
+<br>Vulnerable: NS
+</p>
+<p class="board"><b>Board 6</b><br>
+♠ 4 3 <span style="color:red">♥</span> Q 8 3 2 <span style="color:red">♦</span> A Q 6 4 2 ♣ K 4 
+<br>Dealer: East
+<br>Vulnerable: EW
+</p>
+<p class="board"><b>Board 7</b><br>
+♠ K Q 10 6 5 <span style="color:red">♥</span> Q 2 <span style="color:red">♦</span> Q 8 ♣ Q 9 8 4 
+<br>Dealer: South
+<br>Vulnerable: All
+</p>
+<p class="board"><b>Board 8</b><br>
+♠ K J 8 <span style="color:red">♥</span> A J 2 <span style="color:red">♦</span> A K 8 5 2 ♣ 9 7 
+<br>Dealer: West
+<br>Vulnerable: None
+</p>
+<p class="board"><b>Board 9</b><br>
+♠ Q J 8 <span style="color:red">♥</span> Q 4 <span style="color:red">♦</span> J 10 3 2 ♣ K 6 4 3 
+<br>Dealer: North
+<br>Vulnerable: EW
+</p>
+<p class="board"><b>Board 10</b><br>
+♠ J 8 7 6 <span style="color:red">♥</span> Q 7 3 2 <span style="color:red">♦</span> A Q 4 ♣ 9 7 
+<br>Dealer: East
+<br>Vulnerable: All
+</p>
+<p class="board"><b>Board 11</b><br>
+♠ K Q 3 <span style="color:red">♥</span> 2 <span style="color:red">♦</span> A J 10 9 7 4 ♣ A 9 4 
+<br>Dealer: South
+<br>Vulnerable: None
+</p>
+<p class="board"><b>Board 12</b><br>
+♠ K J 8 <span style="color:red">♥</span> J <span style="color:red">♦</span> Q 10 8 7 ♣ J 8 6 5 3 
+<br>Dealer: West
+<br>Vulnerable: NS
+</p>
+<p class="board"><b>Board 13</b><br>
+♠ A J 3 <span style="color:red">♥</span> 10 2 <span style="color:red">♦</span> 9 8 5 2 ♣ K 9 5 3 
+<br>Dealer: North
+<br>Vulnerable: All
+</p>
+<p class="board"><b>Board 14</b><br>
+♠ K J 6 <span style="color:red">♥</span> 8 <span style="color:red">♦</span> J 8 6 4 ♣ Q J 7 6 2 
+<br>Dealer: East
+<br>Vulnerable: None
+</p>
+<p class="board"><b>Board 15</b><br>
+♠ K 8 <span style="color:red">♥</span> Q 5 <span style="color:red">♦</span> Q 10 9 6 2 ♣ Q J 10 8 
+<br>Dealer: South
+<br>Vulnerable: NS
+</p>
+<p class="board"><b>Board 16</b><br>
+♠ A K 10 9 <span style="color:red">♥</span> A J <span style="color:red">♦</span> A K 8 7 ♣ Q 10 7 
+<br>Dealer: West
+<br>Vulnerable: EW
+</p>
+<p class="board"><b>Board 17</b><br>
+♠ K 9 5 3 <span style="color:red">♥</span> A 10 <span style="color:red">♦</span> Q 10 6 2 ♣ K 7 2 
+<br>Dealer: North
+<br>Vulnerable: None
+</p>
+<p class="board"><b>Board 18</b><br>
+♠ Q 6 4 3 <span style="color:red">♥</span> A Q J 6 <span style="color:red">♦</span> K J 9 5 2 ♣ (void) 
+<br>Dealer: East
+<br>Vulnerable: NS
+</p>
+<p class="board"><b>Board 19</b><br>
+♠ A J 8 <span style="color:red">♥</span> (void) <span style="color:red">♦</span> Q J 10 4 3 ♣ Q 9 7 6 5 
+<br>Dealer: South
+<br>Vulnerable: EW
+</p>
+<p class="board"><b>Board 20</b><br>
+♠ 8 3 <span style="color:red">♥</span> A Q J 10 2 <span style="color:red">♦</span> A 10 9 8 6 ♣ A 
+<br>Dealer: West
+<br>Vulnerable: All
+</p>
+<p class="board"><b>Board 21</b><br>
+♠ Q 9 8 5 <span style="color:red">♥</span> Q 10 <span style="color:red">♦</span> 10 8 ♣ Q 10 9 3 2 
+<br>Dealer: North
+<br>Vulnerable: NS
+</p>
+<p class="board"><b>Board 22</b><br>
+♠ (void) <span style="color:red">♥</span> 9 8 7 5 4 <span style="color:red">♦</span> Q J 7 6 3 ♣ A J 3 
+<br>Dealer: East
+<br>Vulnerable: EW
+</p>
+<p class="board"><b>Board 23</b><br>
+♠ A Q 10 8 7 2 <span style="color:red">♥</span> Q 4 <span style="color:red">♦</span> K Q 9 5 ♣ 8 
+<br>Dealer: South
+<br>Vulnerable: All
+</p>
+<p class="board"><b>Board 24</b><br>
+♠ K 9 7 6 5 2 <span style="color:red">♥</span> Q 3 <span style="color:red">♦</span> 8 5 4 ♣ 6 4 
+<br>Dealer: West
+<br>Vulnerable: None
+</p>
+<p class="board"><b>Board 25</b><br>
+♠ 7 6 5 2 <span style="color:red">♥</span> K J 7 5 <span style="color:red">♦</span> 6 3 2 ♣ 8 4 
+<br>Dealer: North
+<br>Vulnerable: EW
+</p>
+<p class="board"><b>Board 26</b><br>
+♠ A 7 6 5 2 <span style="color:red">♥</span> A J 8 6 5 3 <span style="color:red">♦</span> 7 ♣ 7 
+<br>Dealer: East
+<br>Vulnerable: All
+</p>
+<p class="board"><b>Board 27</b><br>
+♠ Q J 7 <span style="color:red">♥</span> 8 2 <span style="color:red">♦</span> 9 7 3 2 ♣ J 7 4 2 
+<br>Dealer: South
+<br>Vulnerable: None
+</p>
+<p class="board"><b>Board 28</b><br>
+♠ K 10 3 <span style="color:red">♥</span> A 9 3 <span style="color:red">♦</span> J 6 4 ♣ Q 4 3 2 
+<br>Dealer: West
+<br>Vulnerable: NS
+</p>
+<p class="board"><b>Board 29</b><br>
+♠ K 3 2 <span style="color:red">♥</span> Q J 8 7 6 5 4 <span style="color:red">♦</span> 3 ♣ K Q 
+<br>Dealer: North
+<br>Vulnerable: All
+</p>
+<p class="board"><b>Board 30</b><br>
+♠ A 10 <span style="color:red">♥</span> Q 9 8 4 <span style="color:red">♦</span> Q 4 3 ♣ A K 10 7 
+<br>Dealer: East
+<br>Vulnerable: None
+</p>
+<p class="board"><b>Board 31</b><br>
+♠ K 10 6 2 <span style="color:red">♥</span> Q J 8 3 <span style="color:red">♦</span> Q 9 ♣ 9 7 5 
+<br>Dealer: South
+<br>Vulnerable: NS
+</p>
+<p class="board"><b>Board 32</b><br>
+♠ A K J 4 <span style="color:red">♥</span> 7 3 <span style="color:red">♦</span> 7 6 4 ♣ K J 7 5 
+<br>Dealer: West
+<br>Vulnerable: EW
+</p>
+<p class="board"><b>Board 33</b><br>
+♠ 3 <span style="color:red">♥</span> K 9 7 6 <span style="color:red">♦</span> 7 5 3 ♣ A K Q 10 8 
+<br>Dealer: North
+<br>Vulnerable: None
+</p>
+<p class="board"><b>Board 34</b><br>
+♠ K 4 2 <span style="color:red">♥</span> J <span style="color:red">♦</span> 7 5 ♣ A J 10 8 6 5 4 
+<br>Dealer: East
+<br>Vulnerable: NS
+</p>
+<p class="board"><b>Board 35</b><br>
+♠ A J 6 3 <span style="color:red">♥</span> A 2 <span style="color:red">♦</span> Q 10 5 ♣ 10 8 7 5 
+<br>Dealer: South
+<br>Vulnerable: EW
+</p>
+<p class="board"><b>Board 36</b><br>
+♠ K Q 7 6 3 <span style="color:red">♥</span> J 8 5 3 <span style="color:red">♦</span> 7 ♣ J 10 6 
+<br>Dealer: West
+<br>Vulnerable: All
+</p>
+<p style="page-break-after:always;"></p><h1>South</h1><div class="player"><p class="board"><b>Board 1</b><br>
+♠ 9 8 <span style="color:red">♥</span> K Q 7 3 <span style="color:red">♦</span> 10 9 3 ♣ K Q 9 6 
+<br>Dealer: North
+<br>Vulnerable: None
+</p>
+<p class="board"><b>Board 2</b><br>
+♠ 4 <span style="color:red">♥</span> A J 10 6 5 3 <span style="color:red">♦</span> A ♣ 10 7 6 5 3 
+<br>Dealer: East
+<br>Vulnerable: NS
+</p>
+<p class="board"><b>Board 3</b><br>
+♠ K 6 3 <span style="color:red">♥</span> Q J 5 <span style="color:red">♦</span> 9 7 5 ♣ Q J 7 3 
+<br>Dealer: South
+<br>Vulnerable: EW
+</p>
+<p class="board"><b>Board 4</b><br>
+♠ 10 3 <span style="color:red">♥</span> J 8 6 5 4 <span style="color:red">♦</span> J 9 2 ♣ 7 5 3 
+<br>Dealer: West
+<br>Vulnerable: All
+</p>
+<p class="board"><b>Board 5</b><br>
+♠ 10 3 2 <span style="color:red">♥</span> 10 9 7 <span style="color:red">♦</span> K Q 10 7 ♣ 10 5 2 
+<br>Dealer: North
+<br>Vulnerable: NS
+</p>
+<p class="board"><b>Board 6</b><br>
+♠ 10 8 6 5 <span style="color:red">♥</span> 10 9 4 <span style="color:red">♦</span> 9 5 ♣ J 6 5 2 
+<br>Dealer: East
+<br>Vulnerable: EW
+</p>
+<p class="board"><b>Board 7</b><br>
+♠ A <span style="color:red">♥</span> A J 9 8 <span style="color:red">♦</span> A K J 5 ♣ J 10 7 6 
+<br>Dealer: South
+<br>Vulnerable: All
+</p>
+<p class="board"><b>Board 8</b><br>
+♠ A <span style="color:red">♥</span> K Q 7 3 <span style="color:red">♦</span> Q 9 6 ♣ K J 10 8 5 
+<br>Dealer: West
+<br>Vulnerable: None
+</p>
+<p class="board"><b>Board 9</b><br>
+♠ K 7 2 <span style="color:red">♥</span> K J 7 6 <span style="color:red">♦</span> 6 4 ♣ A Q J 7 
+<br>Dealer: North
+<br>Vulnerable: EW
+</p>
+<p class="board"><b>Board 10</b><br>
+♠ 5 2 <span style="color:red">♥</span> A 8 4 <span style="color:red">♦</span> J 9 ♣ A K J 10 8 2 
+<br>Dealer: East
+<br>Vulnerable: All
+</p>
+<p class="board"><b>Board 11</b><br>
+♠ A 10 8 4 <span style="color:red">♥</span> A 7 5 3 <span style="color:red">♦</span> K Q ♣ K 10 8 
+<br>Dealer: South
+<br>Vulnerable: None
+</p>
+<p class="board"><b>Board 12</b><br>
+♠ A 10 6 2 <span style="color:red">♥</span> A K 7 <span style="color:red">♦</span> 3 ♣ A Q 10 7 2 
+<br>Dealer: West
+<br>Vulnerable: NS
+</p>
+<p class="board"><b>Board 13</b><br>
+♠ 10 8 4 <span style="color:red">♥</span> K J 9 <span style="color:red">♦</span> A K Q 4 ♣ 8 6 2 
+<br>Dealer: North
+<br>Vulnerable: All
+</p>
+<p class="board"><b>Board 14</b><br>
+♠ A Q 8 7 <span style="color:red">♥</span> A K Q 6 4 <span style="color:red">♦</span> 10 3 ♣ 8 5 
+<br>Dealer: East
+<br>Vulnerable: None
+</p>
+<p class="board"><b>Board 15</b><br>
+♠ Q J 9 7 5 2 <span style="color:red">♥</span> 9 3 <span style="color:red">♦</span> A J ♣ A 7 4 
+<br>Dealer: South
+<br>Vulnerable: NS
+</p>
+<p class="board"><b>Board 16</b><br>
+♠ J 5 2 <span style="color:red">♥</span> K 6 2 <span style="color:red">♦</span> Q J 10 6 4 3 ♣ J 
+<br>Dealer: West
+<br>Vulnerable: EW
+</p>
+<p class="board"><b>Board 17</b><br>
+♠ A 8 6 4 <span style="color:red">♥</span> K J 7 4 3 <span style="color:red">♦</span> 8 4 ♣ 8 4 
+<br>Dealer: North
+<br>Vulnerable: None
+</p>
+<p class="board"><b>Board 18</b><br>
+♠ K 9 <span style="color:red">♥</span> K 8 5 4 3 <span style="color:red">♦</span> 8 4 3 ♣ 9 7 5 
+<br>Dealer: East
+<br>Vulnerable: NS
+</p>
+<p class="board"><b>Board 19</b><br>
+♠ K 6 <span style="color:red">♥</span> A Q J 7 6 5 4 <span style="color:red">♦</span> 6 2 ♣ J 4 
+<br>Dealer: South
+<br>Vulnerable: EW
+</p>
+<p class="board"><b>Board 20</b><br>
+♠ A 7 6 4 <span style="color:red">♥</span> 9 6 3 <span style="color:red">♦</span> 4 ♣ 10 9 7 4 3 
+<br>Dealer: West
+<br>Vulnerable: All
+</p>
+<p class="board"><b>Board 21</b><br>
+♠ J 7 4 3 <span style="color:red">♥</span> J 6 4 <span style="color:red">♦</span> Q 6 3 2 ♣ 7 5 
+<br>Dealer: North
+<br>Vulnerable: NS
+</p>
+<p class="board"><b>Board 22</b><br>
+♠ 10 5 3 <span style="color:red">♥</span> J 2 <span style="color:red">♦</span> A 5 4 ♣ 9 6 5 4 2 
+<br>Dealer: East
+<br>Vulnerable: EW
+</p>
+<p class="board"><b>Board 23</b><br>
+♠ K J 6 <span style="color:red">♥</span> A K 8 5 <span style="color:red">♦</span> 6 2 ♣ K 9 5 2 
+<br>Dealer: South
+<br>Vulnerable: All
+</p>
+<p class="board"><b>Board 24</b><br>
+♠ A 8 4 <span style="color:red">♥</span> A J 8 4 2 <span style="color:red">♦</span> A 3 2 ♣ J 10 
+<br>Dealer: West
+<br>Vulnerable: None
+</p>
+<p class="board"><b>Board 25</b><br>
+♠ Q 10 9 4 <span style="color:red">♥</span> 9 2 <span style="color:red">♦</span> A K J 8 ♣ A J 7 
+<br>Dealer: North
+<br>Vulnerable: EW
+</p>
+<p class="board"><b>Board 26</b><br>
+♠ 10 <span style="color:red">♥</span> 9 7 <span style="color:red">♦</span> K Q J 9 8 6 4 ♣ Q 5 3 
+<br>Dealer: East
+<br>Vulnerable: All
+</p>
+<p class="board"><b>Board 27</b><br>
+♠ A K 2 <span style="color:red">♥</span> A 10 9 7 4 <span style="color:red">♦</span> A K 5 4 ♣ 5 
+<br>Dealer: South
+<br>Vulnerable: None
+</p>
+<p class="board"><b>Board 28</b><br>
+♠ Q 7 <span style="color:red">♥</span> K Q J 10 <span style="color:red">♦</span> Q 5 3 ♣ K 9 7 6 
+<br>Dealer: West
+<br>Vulnerable: NS
+</p>
+<p class="board"><b>Board 29</b><br>
+♠ Q J 9 8 7 6 4 <span style="color:red">♥</span> K 10 <span style="color:red">♦</span> 5 ♣ A 10 3 
+<br>Dealer: North
+<br>Vulnerable: All
+</p>
+<p class="board"><b>Board 30</b><br>
+♠ 8 7 5 3 <span style="color:red">♥</span> A K 10 5 2 <span style="color:red">♦</span> J 9 2 ♣ 2 
+<br>Dealer: East
+<br>Vulnerable: None
+</p>
+<p class="board"><b>Board 31</b><br>
+♠ 8 3 <span style="color:red">♥</span> 9 7 6 2 <span style="color:red">♦</span> A K 5 2 ♣ A 6 2 
+<br>Dealer: South
+<br>Vulnerable: NS
+</p>
+<p class="board"><b>Board 32</b><br>
+♠ 10 8 5 2 <span style="color:red">♥</span> Q 5 <span style="color:red">♦</span> Q 5 2 ♣ Q 10 9 4 
+<br>Dealer: West
+<br>Vulnerable: EW
+</p>
+<p class="board"><b>Board 33</b><br>
+♠ K J 7 4 <span style="color:red">♥</span> A J 5 4 <span style="color:red">♦</span> 4 2 ♣ 9 6 4 
+<br>Dealer: North
+<br>Vulnerable: None
+</p>
+<p class="board"><b>Board 34</b><br>
+♠ A 8 <span style="color:red">♥</span> K Q 9 7 3 <span style="color:red">♦</span> Q 10 8 6 ♣ K 7 
+<br>Dealer: East
+<br>Vulnerable: NS
+</p>
+<p class="board"><b>Board 35</b><br>
+♠ 8 7 5 <span style="color:red">♥</span> 10 5 3 <span style="color:red">♦</span> A 7 6 4 3 ♣ 9 2 
+<br>Dealer: South
+<br>Vulnerable: EW
+</p>
+<p class="board"><b>Board 36</b><br>
+♠ J 10 8 5 4 <span style="color:red">♥</span> A <span style="color:red">♦</span> 10 5 4 ♣ A 8 4 2 
+<br>Dealer: West
+<br>Vulnerable: All
+</p>
+<p style="page-break-after:always;"></p><h1>East</h1> <div class="player"><p class="board"><b>Board 1</b><br>
+♠ 5 3 2 <span style="color:red">♥</span> 10 2 <span style="color:red">♦</span> K 6 4 2 ♣ A 10 8 2 
+<br>Dealer: North
+<br>Vulnerable: None
+</p>
+<p class="board"><b>Board 2</b><br>
+♠ 9 8 7 5 3 <span style="color:red">♥</span> Q 9 <span style="color:red">♦</span> Q 7 6 ♣ A Q 4 
+<br>Dealer: East
+<br>Vulnerable: NS
+</p>
+<p class="board"><b>Board 3</b><br>
+♠ 9 8 <span style="color:red">♥</span> K 9 8 6 3 <span style="color:red">♦</span> K 3 ♣ 9 8 6 2 
+<br>Dealer: South
+<br>Vulnerable: EW
+</p>
+<p class="board"><b>Board 4</b><br>
+♠ J 8 7 6 4 2 <span style="color:red">♥</span> K <span style="color:red">♦</span> K 8 7 ♣ K 10 6 
+<br>Dealer: West
+<br>Vulnerable: All
+</p>
+<p class="board"><b>Board 5</b><br>
+♠ Q J 8 <span style="color:red">♥</span> J 8 5 2 <span style="color:red">♦</span> 5 2 ♣ K Q 9 6 
+<br>Dealer: North
+<br>Vulnerable: NS
+</p>
+<p class="board"><b>Board 6</b><br>
+♠ K Q J 7 2 <span style="color:red">♥</span> J 5 <span style="color:red">♦</span> 8 7 3 ♣ Q 9 8 
+<br>Dealer: East
+<br>Vulnerable: EW
+</p>
+<p class="board"><b>Board 7</b><br>
+♠ J 8 4 2 <span style="color:red">♥</span> K 7 4 <span style="color:red">♦</span> 10 7 6 ♣ A K 2 
+<br>Dealer: South
+<br>Vulnerable: All
+</p>
+<p class="board"><b>Board 8</b><br>
+♠ 10 9 7 2 <span style="color:red">♥</span> 10 8 6 4 <span style="color:red">♦</span> J 10 7 ♣ Q 6 
+<br>Dealer: West
+<br>Vulnerable: None
+</p>
+<p class="board"><b>Board 9</b><br>
+♠ A 10 6 5 4 <span style="color:red">♥</span> 10 5 2 <span style="color:red">♦</span> 9 8 5 ♣ 10 9 
+<br>Dealer: North
+<br>Vulnerable: EW
+</p>
+<p class="board"><b>Board 10</b><br>
+♠ A 10 9 3 <span style="color:red">♥</span> K 9 <span style="color:red">♦</span> K 10 6 5 2 ♣ 6 4 
+<br>Dealer: East
+<br>Vulnerable: All
+</p>
+<p class="board"><b>Board 11</b><br>
+♠ 9 7 6 2 <span style="color:red">♥</span> K Q J 10 9 6 <span style="color:red">♦</span> 6 ♣ J 5 
+<br>Dealer: South
+<br>Vulnerable: None
+</p>
+<p class="board"><b>Board 12</b><br>
+♠ Q 9 7 5 4 <span style="color:red">♥</span> 10 6 <span style="color:red">♦</span> K J 4 2 ♣ K 4 
+<br>Dealer: West
+<br>Vulnerable: NS
+</p>
+<p class="board"><b>Board 13</b><br>
+♠ K Q 6 5 2 <span style="color:red">♥</span> 7 5 4 <span style="color:red">♦</span> 6 3 ♣ Q 7 4 
+<br>Dealer: North
+<br>Vulnerable: All
+</p>
+<p class="board"><b>Board 14</b><br>
+♠ 5 4 <span style="color:red">♥</span> 10 9 7 5 2 <span style="color:red">♦</span> K 9 7 ♣ A K 3 
+<br>Dealer: East
+<br>Vulnerable: None
+</p>
+<p class="board"><b>Board 15</b><br>
+♠ 10 4 3 <span style="color:red">♥</span> A 10 8 7 6 <span style="color:red">♦</span> 7 3 ♣ K 9 2 
+<br>Dealer: South
+<br>Vulnerable: NS
+</p>
+<p class="board"><b>Board 16</b><br>
+♠ Q 8 7 6 3 <span style="color:red">♥</span> 10 <span style="color:red">♦</span> 5 2 ♣ A K 8 4 2 
+<br>Dealer: West
+<br>Vulnerable: EW
+</p>
+<p class="board"><b>Board 17</b><br>
+♠ 10 7 2 <span style="color:red">♥</span> 9 2 <span style="color:red">♦</span> K J 9 5 3 ♣ 10 5 3 
+<br>Dealer: North
+<br>Vulnerable: None
+</p>
+<p class="board"><b>Board 18</b><br>
+♠ J 10 2 <span style="color:red">♥</span> 10 9 2 <span style="color:red">♦</span> Q ♣ A Q J 10 4 3 
+<br>Dealer: East
+<br>Vulnerable: NS
+</p>
+<p class="board"><b>Board 19</b><br>
+♠ Q 7 5 3 <span style="color:red">♥</span> 10 2 <span style="color:red">♦</span> A 9 8 7 5 ♣ 8 2 
+<br>Dealer: South
+<br>Vulnerable: EW
+</p>
+<p class="board"><b>Board 20</b><br>
+♠ 9 <span style="color:red">♥</span> K 8 5 <span style="color:red">♦</span> 7 5 2 ♣ K Q J 8 5 2 
+<br>Dealer: West
+<br>Vulnerable: All
+</p>
+<p class="board"><b>Board 21</b><br>
+♠ K 6 <span style="color:red">♥</span> A 9 5 3 <span style="color:red">♦</span> A K J 7 5 ♣ A 6 
+<br>Dealer: North
+<br>Vulnerable: NS
+</p>
+<p class="board"><b>Board 22</b><br>
+♠ K Q 8 6 4 2 <span style="color:red">♥</span> A 10 <span style="color:red">♦</span> 8 2 ♣ K 8 7 
+<br>Dealer: East
+<br>Vulnerable: EW
+</p>
+<p class="board"><b>Board 23</b><br>
+♠ 9 5 <span style="color:red">♥</span> J 10 9 7 6 3 <span style="color:red">♦</span> J 8 3 ♣ 7 6 
+<br>Dealer: South
+<br>Vulnerable: All
+</p>
+<p class="board"><b>Board 24</b><br>
+♠ Q J 10 3 <span style="color:red">♥</span> 10 7 6 <span style="color:red">♦</span> 7 6 ♣ K 8 7 3 
+<br>Dealer: West
+<br>Vulnerable: None
+</p>
+<p class="board"><b>Board 25</b><br>
+♠ A J 8 <span style="color:red">♥</span> 10 4 <span style="color:red">♦</span> 10 9 5 ♣ 9 6 5 3 2 
+<br>Dealer: North
+<br>Vulnerable: EW
+</p>
+<p class="board"><b>Board 26</b><br>
+♠ Q J 8 <span style="color:red">♥</span> 10 4 <span style="color:red">♦</span> A 10 3 ♣ 10 9 8 6 4 
+<br>Dealer: East
+<br>Vulnerable: All
+</p>
+<p class="board"><b>Board 27</b><br>
+♠ 10 5 4 3 <span style="color:red">♥</span> J 5 3 <span style="color:red">♦</span> J 10 8 ♣ 10 8 6 
+<br>Dealer: South
+<br>Vulnerable: None
+</p>
+<p class="board"><b>Board 28</b><br>
+♠ 8 2 <span style="color:red">♥</span> 7 4 2 <span style="color:red">♦</span> A 10 9 8 7 ♣ A 10 8 
+<br>Dealer: West
+<br>Vulnerable: NS
+</p>
+<p class="board"><b>Board 29</b><br>
+♠ A 10 <span style="color:red">♥</span> (void) <span style="color:red">♦</span> K J 9 7 6 4 ♣ 8 7 6 5 2 
+<br>Dealer: North
+<br>Vulnerable: All
+</p>
+<p class="board"><b>Board 30</b><br>
+♠ Q <span style="color:red">♥</span> J 7 6 3 <span style="color:red">♦</span> A K 5 ♣ Q 8 5 4 3 
+<br>Dealer: East
+<br>Vulnerable: None
+</p>
+<p class="board"><b>Board 31</b><br>
+♠ Q 7 5 <span style="color:red">♥</span> A 10 4 <span style="color:red">♦</span> 8 3 ♣ K J 10 8 4 
+<br>Dealer: South
+<br>Vulnerable: NS
+</p>
+<p class="board"><b>Board 32</b><br>
+♠ 9 6 3 <span style="color:red">♥</span> J 10 2 <span style="color:red">♦</span> A 10 9 3 ♣ A 6 2 
+<br>Dealer: West
+<br>Vulnerable: EW
+</p>
+<p class="board"><b>Board 33</b><br>
+♠ Q 9 8 2 <span style="color:red">♥</span> 8 2 <span style="color:red">♦</span> A K J 10 8 ♣ 5 2 
+<br>Dealer: North
+<br>Vulnerable: None
+</p>
+<p class="board"><b>Board 34</b><br>
+♠ 10 9 3 <span style="color:red">♥</span> 10 8 5 4 <span style="color:red">♦</span> A K 3 2 ♣ Q 2 
+<br>Dealer: East
+<br>Vulnerable: NS
+</p>
+<p class="board"><b>Board 35</b><br>
+♠ K 9 2 <span style="color:red">♥</span> K Q 9 8 <span style="color:red">♦</span> K J 9 2 ♣ 6 4 
+<br>Dealer: South
+<br>Vulnerable: EW
+</p>
+<p class="board"><b>Board 36</b><br>
+♠ A 2 <span style="color:red">♥</span> Q 9 7 6 4 <span style="color:red">♦</span> J 6 3 ♣ 7 5 3 
+<br>Dealer: West
+<br>Vulnerable: All
+</p>
+<p style="page-break-after:always;"></p><h1>West</h1> <div class="player"><p class="board"><b>Board 1</b><br>
+♠ Q 10 7 4 <span style="color:red">♥</span> A J 8 4 <span style="color:red">♦</span> 8 7 ♣ J 7 4 
+<br>Dealer: North
+<br>Vulnerable: None
+</p>
+<p class="board"><b>Board 2</b><br>
+♠ Q J 10 <span style="color:red">♥</span> K 4 <span style="color:red">♦</span> J 9 8 4 2 ♣ J 9 8 
+<br>Dealer: East
+<br>Vulnerable: NS
+</p>
+<p class="board"><b>Board 3</b><br>
+♠ A Q J 5 4 <span style="color:red">♥</span> A 7 2 <span style="color:red">♦</span> Q 4 ♣ K 10 4 
+<br>Dealer: South
+<br>Vulnerable: EW
+</p>
+<p class="board"><b>Board 4</b><br>
+♠ K <span style="color:red">♥</span> A 9 2 <span style="color:red">♦</span> A 10 6 3 ♣ A Q 9 4 2 
+<br>Dealer: West
+<br>Vulnerable: All
+</p>
+<p class="board"><b>Board 5</b><br>
+♠ A 9 <span style="color:red">♥</span> 6 4 <span style="color:red">♦</span> A J 9 6 4 ♣ A J 8 4 
+<br>Dealer: North
+<br>Vulnerable: NS
+</p>
+<p class="board"><b>Board 6</b><br>
+♠ A 9 <span style="color:red">♥</span> A K 7 6 <span style="color:red">♦</span> K J 10 ♣ A 10 7 3 
+<br>Dealer: East
+<br>Vulnerable: EW
+</p>
+<p class="board"><b>Board 7</b><br>
+♠ 9 7 3 <span style="color:red">♥</span> 10 6 5 3 <span style="color:red">♦</span> 9 4 3 2 ♣ 5 3 
+<br>Dealer: South
+<br>Vulnerable: All
+</p>
+<p class="board"><b>Board 8</b><br>
+♠ Q 6 5 4 3 <span style="color:red">♥</span> 9 5 <span style="color:red">♦</span> 4 3 ♣ A 4 3 2 
+<br>Dealer: West
+<br>Vulnerable: None
+</p>
+<p class="board"><b>Board 9</b><br>
+♠ 9 3 <span style="color:red">♥</span> A 9 8 3 <span style="color:red">♦</span> A K Q 7 ♣ 8 5 2 
+<br>Dealer: North
+<br>Vulnerable: EW
+</p>
+<p class="board"><b>Board 10</b><br>
+♠ K Q 4 <span style="color:red">♥</span> J 10 6 5 <span style="color:red">♦</span> 8 7 3 ♣ Q 5 3 
+<br>Dealer: East
+<br>Vulnerable: All
+</p>
+<p class="board"><b>Board 11</b><br>
+♠ J 5 <span style="color:red">♥</span> 8 4 <span style="color:red">♦</span> 8 5 3 2 ♣ Q 7 6 3 2 
+<br>Dealer: South
+<br>Vulnerable: None
+</p>
+<p class="board"><b>Board 12</b><br>
+♠ 3 <span style="color:red">♥</span> Q 9 8 5 4 3 2 <span style="color:red">♦</span> A 9 6 5 ♣ 9 
+<br>Dealer: West
+<br>Vulnerable: NS
+</p>
+<p class="board"><b>Board 13</b><br>
+♠ 9 7 <span style="color:red">♥</span> A Q 8 6 3 <span style="color:red">♦</span> J 10 7 ♣ A J 10 
+<br>Dealer: North
+<br>Vulnerable: All
+</p>
+<p class="board"><b>Board 14</b><br>
+♠ 10 9 3 2 <span style="color:red">♥</span> J 3 <span style="color:red">♦</span> A Q 5 2 ♣ 10 9 4 
+<br>Dealer: East
+<br>Vulnerable: None
+</p>
+<p class="board"><b>Board 15</b><br>
+♠ A 6 <span style="color:red">♥</span> K J 4 2 <span style="color:red">♦</span> K 8 5 4 ♣ 6 5 3 
+<br>Dealer: South
+<br>Vulnerable: NS
+</p>
+<p class="board"><b>Board 16</b><br>
+♠ 4 <span style="color:red">♥</span> Q 9 8 7 5 4 3 <span style="color:red">♦</span> 9 ♣ 9 6 5 3 
+<br>Dealer: West
+<br>Vulnerable: EW
+</p>
+<p class="board"><b>Board 17</b><br>
+♠ Q J <span style="color:red">♥</span> Q 8 6 5 <span style="color:red">♦</span> A 7 ♣ A Q J 9 6 
+<br>Dealer: North
+<br>Vulnerable: None
+</p>
+<p class="board"><b>Board 18</b><br>
+♠ A 8 7 5 <span style="color:red">♥</span> 7 <span style="color:red">♦</span> A 10 7 6 ♣ K 8 6 2 
+<br>Dealer: East
+<br>Vulnerable: NS
+</p>
+<p class="board"><b>Board 19</b><br>
+♠ 10 9 4 2 <span style="color:red">♥</span> K 9 8 3 <span style="color:red">♦</span> K ♣ A K 10 3 
+<br>Dealer: South
+<br>Vulnerable: EW
+</p>
+<p class="board"><b>Board 20</b><br>
+♠ K Q J 10 5 2 <span style="color:red">♥</span> 7 4 <span style="color:red">♦</span> K Q J 3 ♣ 6 
+<br>Dealer: West
+<br>Vulnerable: All
+</p>
+<p class="board"><b>Board 21</b><br>
+♠ A 10 2 <span style="color:red">♥</span> K 8 7 2 <span style="color:red">♦</span> 9 4 ♣ K J 8 4 
+<br>Dealer: North
+<br>Vulnerable: NS
+</p>
+<p class="board"><b>Board 22</b><br>
+♠ A J 9 7 <span style="color:red">♥</span> K Q 6 3 <span style="color:red">♦</span> K 10 9 ♣ Q 10 
+<br>Dealer: East
+<br>Vulnerable: EW
+</p>
+<p class="board"><b>Board 23</b><br>
+♠ 4 3 <span style="color:red">♥</span> 2 <span style="color:red">♦</span> A 10 7 4 ♣ A Q J 10 4 3 
+<br>Dealer: South
+<br>Vulnerable: All
+</p>
+<p class="board"><b>Board 24</b><br>
+♠ (void) <span style="color:red">♥</span> K 9 5 <span style="color:red">♦</span> K Q J 10 9 ♣ A Q 9 5 2 
+<br>Dealer: West
+<br>Vulnerable: None
+</p>
+<p class="board"><b>Board 25</b><br>
+♠ K 3 <span style="color:red">♥</span> A Q 8 6 3 <span style="color:red">♦</span> Q 7 4 ♣ K Q 10 
+<br>Dealer: North
+<br>Vulnerable: EW
+</p>
+<p class="board"><b>Board 26</b><br>
+♠ K 9 4 3 <span style="color:red">♥</span> K Q 2 <span style="color:red">♦</span> 5 2 ♣ A K J 2 
+<br>Dealer: East
+<br>Vulnerable: All
+</p>
+<p class="board"><b>Board 27</b><br>
+♠ 9 8 6 <span style="color:red">♥</span> K Q 6 <span style="color:red">♦</span> Q 6 ♣ A K Q 9 3 
+<br>Dealer: South
+<br>Vulnerable: None
+</p>
+<p class="board"><b>Board 28</b><br>
+♠ A J 9 6 5 4 <span style="color:red">♥</span> 8 6 5 <span style="color:red">♦</span> K 2 ♣ J 5 
+<br>Dealer: West
+<br>Vulnerable: NS
+</p>
+<p class="board"><b>Board 29</b><br>
+♠ 5 <span style="color:red">♥</span> A 9 3 2 <span style="color:red">♦</span> A Q 10 8 2 ♣ J 9 4 
+<br>Dealer: North
+<br>Vulnerable: All
+</p>
+<p class="board"><b>Board 30</b><br>
+♠ K J 9 6 4 2 <span style="color:red">♥</span> (void) <span style="color:red">♦</span> 10 8 7 6 ♣ J 9 6 
+<br>Dealer: East
+<br>Vulnerable: None
+</p>
+<p class="board"><b>Board 31</b><br>
+♠ A J 9 4 <span style="color:red">♥</span> K 5 <span style="color:red">♦</span> J 10 7 6 4 ♣ Q 3 
+<br>Dealer: South
+<br>Vulnerable: NS
+</p>
+<p class="board"><b>Board 32</b><br>
+♠ Q 7 <span style="color:red">♥</span> A K 9 8 6 4 <span style="color:red">♦</span> K J 8 ♣ 8 3 
+<br>Dealer: West
+<br>Vulnerable: EW
+</p>
+<p class="board"><b>Board 33</b><br>
+♠ A 10 6 5 <span style="color:red">♥</span> Q 10 3 <span style="color:red">♦</span> Q 9 6 ♣ J 7 3 
+<br>Dealer: North
+<br>Vulnerable: None
+</p>
+<p class="board"><b>Board 34</b><br>
+♠ Q J 7 6 5 <span style="color:red">♥</span> A 6 2 <span style="color:red">♦</span> J 9 4 ♣ 9 3 
+<br>Dealer: East
+<br>Vulnerable: NS
+</p>
+<p class="board"><b>Board 35</b><br>
+♠ Q 10 4 <span style="color:red">♥</span> J 7 6 4 <span style="color:red">♦</span> 8 ♣ A K Q J 3 
+<br>Dealer: South
+<br>Vulnerable: EW
+</p>
+<p class="board"><b>Board 36</b><br>
+♠ 9 <span style="color:red">♥</span> K 10 2 <span style="color:red">♦</span> A K Q 9 8 2 ♣ K Q 9 
+<br>Dealer: West
+<br>Vulnerable: All
+</p>
+
+  </html>

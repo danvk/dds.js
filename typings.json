@@ -1,0 +1,6 @@
+{
+  "globalDependencies": {
+    "node": "registry:env/node#6.0.0+20160610031852",
+    "underscore": "registry:dt/underscore#1.7.0+20160619041622"
+  }
+}
