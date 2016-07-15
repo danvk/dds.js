@@ -129,11 +129,12 @@ function loadDeals(pbnFile: string): PbnDeal[] {
   return deals;
 }
 
+// Note: in alternating color by suit, the way I like to order my hand.
 const SUIT_SYMBOLS: {[suit: string]: string} = {
   'S': '♠',
   'H': '<span style="color:red">♥</span>',
-  'D': '<span style="color:red">♦</span>',
-  'C': '♣'
+  'C': '♣',
+  'D': '<span style="color:red">♦</span>'
 };
 
 function dealsToHTML(deals: PbnDeal[]): string {
@@ -147,7 +148,7 @@ function dealsToHTML(deals: PbnDeal[]): string {
   for (const deal of deals) {
     const hand = parsePBN(deal.pbn);
     PLAYERS.forEach(player => {
-      let handHTML = `<p class="board"><b>Board ${deal.board}</b><br>\n`;
+      let handHTML = '';
       _.forEach(SUIT_SYMBOLS, (sym, suit) => {
         const holding = hand[player][suit];
         const holdingHTML = holding.length > 0 ?
@@ -155,13 +156,22 @@ function dealsToHTML(deals: PbnDeal[]): string {
           '(void)';
         handHTML += `${sym} ${holdingHTML} `;
       });
-      handHTML += `\n<br>Dealer: ${PLAYER_NAMES[deal.dealer]}`;
-      handHTML += `\n<br>Vulnerable: ${deal.vulnerability}`;
-      handHTML += '\n</p>\n';
-      out[player] += handHTML;
+      const hcp = highCardPoints(hand[player]);
+
+      out[player] += `<div class="board">
+        <b>Board ${deal.board}</b>
+        <div class=board-inner>
+          <span class=hand>${handHTML}</span>
+          <span class=dealer>Dealer: ${PLAYER_NAMES[deal.dealer]}</span>
+          <span class=hcp>(${hcp})</span>
+          <span class=vulnerability>Vulnerable: ${deal.vulnerability}</span>
+        </div>
+      </div>`;
     });
   }
-  _.each(out, html => { html += '</div>'; });
+  _.each(out, (html, player) => {
+    out[player] += '</div>';  // close class="player" div
+  });
 
   const handsHTML = _.values(out).join('<p style="page-break-after:always;"></p>');
   return `<html>
@@ -173,8 +183,19 @@ function dealsToHTML(deals: PbnDeal[]): string {
       }
       .board {
         display: inline-block;
-        width: 45%;
+        width: 50%;
+        margin-top: 1em;
         margin-bottom: 0.5em;
+      }
+      .board-inner {
+        display: table;
+      }
+      .hcp {
+        float: right;
+        font-size: small;
+      }
+      .dealer, .vulnerability {
+        display: block;
       }
     </style>
   </head>
@@ -182,12 +203,11 @@ function dealsToHTML(deals: PbnDeal[]): string {
   </html>`;
 }
 
-const data = fs.readFileSync('HandRecord-12.pbn');
-const deals = loadDeals(data.toString());
-console.log('Loaded ', deals.length, ' deals.');
-// for (const deal of deals) {
-//   const hcp = highCardPoints(parsePBN(deal.pbn)['E']);
-//   console.log(`${deal.board}: ${hcp}`);
-// }
+const [,, pbnFile] = process.argv;
+
+const data = fs.readFileSync(pbnFile).toString();
+const deals = loadDeals(data);
 
 fs.writeFileSync('deals.html', dealsToHTML(deals));
+
+console.log('Rendered ', deals.length, ' deals --> deals.html');
