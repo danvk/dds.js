@@ -102,6 +102,10 @@ function highCardPoints(hand: Hand): number {
   return hcp;
 }
 
+function ddUrl(deal: PbnDeal): string {
+  return `http://www.danvk.org/bridge/?deal=${deal.pbn}`;
+}
+
 function loadDeals(pbnFile: string): PbnDeal[] {
   const lines = pbnFile.split('\n');
   const deals: PbnDeal[] = [];
@@ -154,12 +158,12 @@ function dealsToHTML(deals: PbnDeal[]): string {
         const holdingHTML = holding.length > 0 ?
           holding.map(rankToText).join(' ') :
           '(void)';
-        handHTML += `${sym} ${holdingHTML} `;
+        handHTML += `<span class=suit>${sym} ${holdingHTML}</span>`;
       });
       const hcp = highCardPoints(hand[player]);
 
       out[player] += `<div class="board">
-        <b>Board ${deal.board}</b>
+        <b><a target=_blank href="${ddUrl(deal)}">Board ${deal.board}</a></b>
         <div class=board-inner>
           <span class=hand>${handHTML}</span>
           <span class=dealer>Dealer: ${PLAYER_NAMES[deal.dealer]}</span>
@@ -187,8 +191,16 @@ function dealsToHTML(deals: PbnDeal[]): string {
         margin-top: 1em;
         margin-bottom: 0.5em;
       }
+      .board a {
+        color: black;
+      }
       .board-inner {
         display: table;
+        min-width: 275px;
+      }
+      .hand {
+        display: flex;
+        justify-content: space-between;
       }
       .hcp {
         float: right;
